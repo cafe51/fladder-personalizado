@@ -212,11 +212,22 @@ class SeerrService {
     String? language,
     SeerrMediaType? mediaType,
   }) async {
+    final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
+
     if (tvdbId != null) {
       if (tmdbId == null) return null;
       final tvResponse = await tvDetails(tvId: tmdbId, language: language);
       if (!tvResponse.isSuccessful || tvResponse.body == null) return null;
       final details = tvResponse.body!;
+      
+      if (isKidsMode) {
+        final genres = details.genres ?? [];
+        if (genres.isEmpty) return null;
+        final hasKidsGenre = genres.any((g) => g.id == 16 || g.id == 10751 || g.id == 10762);
+        final hasAdultGenre = genres.any((g) => g.id == 27 || g.id == 80 || g.id == 53);
+        if (!hasKidsGenre || hasAdultGenre) return null;
+      }
+      
       final seasonStatusMap = _seasonStatusMap(details.mediaInfo?.seasons);
       String? releaseYear;
       final firstAirDate = details.firstAirDate;
@@ -244,6 +255,15 @@ class SeerrService {
         final tvResponse = await tvDetails(tvId: tmdbId, language: language);
         if (!tvResponse.isSuccessful || tvResponse.body == null) return null;
         final details = tvResponse.body!;
+        
+        if (isKidsMode) {
+          final genres = details.genres ?? [];
+          if (genres.isEmpty) return null;
+          final hasKidsGenre = genres.any((g) => g.id == 16 || g.id == 10751 || g.id == 10762);
+          final hasAdultGenre = genres.any((g) => g.id == 27 || g.id == 80 || g.id == 53);
+          if (!hasKidsGenre || hasAdultGenre) return null;
+        }
+
         final seasonStatusMap = _seasonStatusMap(details.mediaInfo?.seasons);
         String? releaseYear;
         final firstAirDate = details.firstAirDate;
@@ -268,6 +288,15 @@ class SeerrService {
         final movieResponse = await movieDetails(tmdbId: tmdbId, language: language);
         if (!movieResponse.isSuccessful || movieResponse.body == null) return null;
         final details = movieResponse.body!;
+        
+        if (isKidsMode) {
+          final genres = details.genres ?? [];
+          if (genres.isEmpty) return null;
+          final hasKidsGenre = genres.any((g) => g.id == 16 || g.id == 10751 || g.id == 10762);
+          final hasAdultGenre = genres.any((g) => g.id == 27 || g.id == 80 || g.id == 53);
+          if (!hasKidsGenre || hasAdultGenre) return null;
+        }
+
         String? releaseYear;
         final releaseDate = details.releaseDate;
         if (releaseDate != null && releaseDate.isNotEmpty) {
