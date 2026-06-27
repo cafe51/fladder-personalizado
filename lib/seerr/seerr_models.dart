@@ -1243,6 +1243,8 @@ class SeerrDiscoverItem {
   final SeerrMediaInfo? mediaInfo;
   @JsonKey(readValue: _readJellyfinMediaId)
   final String? mediaId;
+  @JsonKey(name: 'genreIds')
+  final List<int>? genreIds;
 
   SeerrDiscoverItem({
     this.id,
@@ -1258,6 +1260,7 @@ class SeerrDiscoverItem {
     this.firstAirDate,
     this.mediaInfo,
     this.mediaId,
+    this.genreIds,
   });
 
   factory SeerrDiscoverItem.fromJson(Map<String, dynamic> json) => _$SeerrDiscoverItemFromJson(json);

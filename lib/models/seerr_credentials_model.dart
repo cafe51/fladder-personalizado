@@ -15,6 +15,7 @@ abstract class SeerrCredentialsModel with _$SeerrCredentialsModel {
     @Default("") String sessionCookie,
     @Default({}) Map<String, String> customHeaders,
     @Default(false) bool enableQuickRequest,
+    @Default(false) bool enableKidsMode,
     int? defaultRadarrServerId,
     int? defaultRadarrProfileId,
     String? defaultRadarrRootFolder,

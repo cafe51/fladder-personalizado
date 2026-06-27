@@ -718,6 +718,9 @@ SeerrDiscoverItem _$SeerrDiscoverItemFromJson(Map<String, dynamic> json) =>
           ? null
           : SeerrMediaInfo.fromJson(json['mediaInfo'] as Map<String, dynamic>),
       mediaId: _readJellyfinMediaId(json, 'mediaId') as String?,
+      genreIds: (json['genreIds'] as List<dynamic>?)
+          ?.map((e) => (e as num).toInt())
+          .toList(),
     );
 
 Map<String, dynamic> _$SeerrDiscoverItemToJson(SeerrDiscoverItem instance) =>
@@ -735,6 +738,7 @@ Map<String, dynamic> _$SeerrDiscoverItemToJson(SeerrDiscoverItem instance) =>
       'firstAirDate': instance.firstAirDate,
       'mediaInfo': instance.mediaInfo,
       'mediaId': instance.mediaId,
+      'genreIds': instance.genreIds,
     };
 
 const _$SeerrMediaTypeEnumMap = {

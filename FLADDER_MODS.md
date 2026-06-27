@@ -62,3 +62,22 @@ Por segurança, a chave mestra para habilitar isso na tela de Configurações s�
 - `lib/screens/settings/profile_settings_page.dart`: Modificada para renderizar condicionalmente o botão que abre esse Dialog com base nos limites e permissões da classe `SeerrUserModel`.
 - `lib/providers/seerr/seerr_request_provider.dart`: Novo método `submitQuickMovieRequest` que abstrai e pula toda a validação de UI, realizando o post REST diretamente.
 - `lib/screens/seerr/widgets/seerr_poster_card.dart` e `lib/screens/seerr/seerr_details_screen.dart`: Interceptação do botão "Request" original.
+
+---
+
+## 4. Filtro Parental (Kids Mode)
+
+**Objetivo:**
+Adicionar uma camada de segurança por conta de usuário, onde contas de crianças fiquem completamente blindadas e isoladas de conteúdos adultos, exibindo apenas Animações e Filmes/Séries familiares (estilo Disney, Dreamworks).
+
+**Lógica Utilizada:**
+Como a API de Busca (Search) do Jellyseerr não recebe e nem retorna faixa etária (Livre, 12 anos, etc.), uma filtragem extra usando `genreIds` se provou a única alternativa inteligente, rápida e segura.
+Criou-se uma chave booleana salva localmente por conta de usuário (no provedor principal `userProvider`).
+- **Dashboard & Recomendações:** O Fladder injeta os gêneros 16 (Animação) e 10751 (Família) diretamente na API do TMDB/Jellyseerr. Toda a tela inicial é repovoada de forma nativa pela API para exibir apenas conteúdo infantil.
+- **Barra de Busca (Search):** O Fladder intercepta os resultados no lado do cliente. Exigimos que o filme/série contenha ao menos um gênero infantil (16, 10751 ou 10762) para poder aparecer, e destruímos da lista qualquer resultado que possua gêneros inapropriados (como 27-Terror, 80-Crime ou 53-Thriller). O bloqueio de busca acontece na velocidade da luz (memória local) sem precisar de requisições N+1.
+
+**Principais Arquivos Modificados:**
+- `lib/models/seerr_credentials_model.dart`: Adicionada a propriedade `enableKidsMode` vinculada ao usuário logado.
+- `lib/seerr/seerr_models.dart`: O modelo `SeerrDiscoverItem` foi re-mapeado para ler e reter a lista `genreIds` que vem do TMDB (que antes era ignorada).
+- `lib/screens/settings/profile_settings_page.dart`: Inclusão do "switch" visual de Liga/Desliga para configurar a conta, dentro da aba "Configurações de Perfil".
+- `lib/providers/seerr_service_provider.dart`: Interceptação das quatro rotas de `Discover` (Trendings/Populares) para injetar strings de gêneros e re-codificação do método de `Search` para excluir resultados perigosos localmente.

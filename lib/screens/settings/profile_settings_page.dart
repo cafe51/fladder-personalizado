@@ -355,6 +355,19 @@ class _UserSettingsPageState extends ConsumerState<ProfileSettingsPage> with Wid
                 subLabel: const Text("Pular a janela de opções ao requisitar filmes"),
                 onTap: () => showSeerrQuickRequestDialog(context),
               ),
+            SettingsListTileCheckbox(
+              label: const Text("Filtro Parental (Kids Mode)"),
+              subLabel: const Text("Oculta filmes/séries adultas e exibe apenas animações e família."),
+              value: user?.seerrCredentials?.enableKidsMode ?? false,
+              onChanged: (val) async {
+                final current = ref.read(userProvider);
+                if (current == null || val == null) return;
+                final creds = current.seerrCredentials ?? const SeerrCredentialsModel();
+                ref.read(userProvider.notifier).userState = current.copyWith(
+                  seerrCredentials: creds.copyWith(enableKidsMode: val),
+                );
+              },
+            ),
             if (seerrUser?.canManageRequests ?? false)
               SettingsListTileCheckbox(
                 label: Text(context.localized.seerrRequestNotifications),

@@ -19,6 +19,7 @@ mixin _$SeerrCredentialsModel {
   String get sessionCookie;
   Map<String, String> get customHeaders;
   bool get enableQuickRequest;
+  bool get enableKidsMode;
   int? get defaultRadarrServerId;
   int? get defaultRadarrProfileId;
   String? get defaultRadarrRootFolder;
@@ -36,7 +37,7 @@ mixin _$SeerrCredentialsModel {
 
   @override
   String toString() {
-    return 'SeerrCredentialsModel(serverUrl: $serverUrl, apiKey: $apiKey, sessionCookie: $sessionCookie, customHeaders: $customHeaders, enableQuickRequest: $enableQuickRequest, defaultRadarrServerId: $defaultRadarrServerId, defaultRadarrProfileId: $defaultRadarrProfileId, defaultRadarrRootFolder: $defaultRadarrRootFolder)';
+    return 'SeerrCredentialsModel(serverUrl: $serverUrl, apiKey: $apiKey, sessionCookie: $sessionCookie, customHeaders: $customHeaders, enableQuickRequest: $enableQuickRequest, enableKidsMode: $enableKidsMode, defaultRadarrServerId: $defaultRadarrServerId, defaultRadarrProfileId: $defaultRadarrProfileId, defaultRadarrRootFolder: $defaultRadarrRootFolder)';
   }
 }
 
@@ -52,6 +53,7 @@ abstract mixin class $SeerrCredentialsModelCopyWith<$Res> {
       String sessionCookie,
       Map<String, String> customHeaders,
       bool enableQuickRequest,
+      bool enableKidsMode,
       int? defaultRadarrServerId,
       int? defaultRadarrProfileId,
       String? defaultRadarrRootFolder});
@@ -75,6 +77,7 @@ class _$SeerrCredentialsModelCopyWithImpl<$Res>
     Object? sessionCookie = null,
     Object? customHeaders = null,
     Object? enableQuickRequest = null,
+    Object? enableKidsMode = null,
     Object? defaultRadarrServerId = freezed,
     Object? defaultRadarrProfileId = freezed,
     Object? defaultRadarrRootFolder = freezed,
@@ -99,6 +102,10 @@ class _$SeerrCredentialsModelCopyWithImpl<$Res>
       enableQuickRequest: null == enableQuickRequest
           ? _self.enableQuickRequest
           : enableQuickRequest // ignore: cast_nullable_to_non_nullable
+              as bool,
+      enableKidsMode: null == enableKidsMode
+          ? _self.enableKidsMode
+          : enableKidsMode // ignore: cast_nullable_to_non_nullable
               as bool,
       defaultRadarrServerId: freezed == defaultRadarrServerId
           ? _self.defaultRadarrServerId
@@ -215,6 +222,7 @@ extension SeerrCredentialsModelPatterns on SeerrCredentialsModel {
             String sessionCookie,
             Map<String, String> customHeaders,
             bool enableQuickRequest,
+            bool enableKidsMode,
             int? defaultRadarrServerId,
             int? defaultRadarrProfileId,
             String? defaultRadarrRootFolder)?
@@ -230,6 +238,7 @@ extension SeerrCredentialsModelPatterns on SeerrCredentialsModel {
             _that.sessionCookie,
             _that.customHeaders,
             _that.enableQuickRequest,
+            _that.enableKidsMode,
             _that.defaultRadarrServerId,
             _that.defaultRadarrProfileId,
             _that.defaultRadarrRootFolder);
@@ -259,6 +268,7 @@ extension SeerrCredentialsModelPatterns on SeerrCredentialsModel {
             String sessionCookie,
             Map<String, String> customHeaders,
             bool enableQuickRequest,
+            bool enableKidsMode,
             int? defaultRadarrServerId,
             int? defaultRadarrProfileId,
             String? defaultRadarrRootFolder)
@@ -273,6 +283,7 @@ extension SeerrCredentialsModelPatterns on SeerrCredentialsModel {
             _that.sessionCookie,
             _that.customHeaders,
             _that.enableQuickRequest,
+            _that.enableKidsMode,
             _that.defaultRadarrServerId,
             _that.defaultRadarrProfileId,
             _that.defaultRadarrRootFolder);
@@ -301,6 +312,7 @@ extension SeerrCredentialsModelPatterns on SeerrCredentialsModel {
             String sessionCookie,
             Map<String, String> customHeaders,
             bool enableQuickRequest,
+            bool enableKidsMode,
             int? defaultRadarrServerId,
             int? defaultRadarrProfileId,
             String? defaultRadarrRootFolder)?
@@ -315,6 +327,7 @@ extension SeerrCredentialsModelPatterns on SeerrCredentialsModel {
             _that.sessionCookie,
             _that.customHeaders,
             _that.enableQuickRequest,
+            _that.enableKidsMode,
             _that.defaultRadarrServerId,
             _that.defaultRadarrProfileId,
             _that.defaultRadarrRootFolder);
@@ -333,6 +346,7 @@ class _SeerrCredentialsModel extends SeerrCredentialsModel {
       this.sessionCookie = "",
       final Map<String, String> customHeaders = const {},
       this.enableQuickRequest = false,
+      this.enableKidsMode = false,
       this.defaultRadarrServerId,
       this.defaultRadarrProfileId,
       this.defaultRadarrRootFolder})
@@ -363,6 +377,9 @@ class _SeerrCredentialsModel extends SeerrCredentialsModel {
   @JsonKey()
   final bool enableQuickRequest;
   @override
+  @JsonKey()
+  final bool enableKidsMode;
+  @override
   final int? defaultRadarrServerId;
   @override
   final int? defaultRadarrProfileId;
@@ -387,7 +404,7 @@ class _SeerrCredentialsModel extends SeerrCredentialsModel {
 
   @override
   String toString() {
-    return 'SeerrCredentialsModel(serverUrl: $serverUrl, apiKey: $apiKey, sessionCookie: $sessionCookie, customHeaders: $customHeaders, enableQuickRequest: $enableQuickRequest, defaultRadarrServerId: $defaultRadarrServerId, defaultRadarrProfileId: $defaultRadarrProfileId, defaultRadarrRootFolder: $defaultRadarrRootFolder)';
+    return 'SeerrCredentialsModel(serverUrl: $serverUrl, apiKey: $apiKey, sessionCookie: $sessionCookie, customHeaders: $customHeaders, enableQuickRequest: $enableQuickRequest, enableKidsMode: $enableKidsMode, defaultRadarrServerId: $defaultRadarrServerId, defaultRadarrProfileId: $defaultRadarrProfileId, defaultRadarrRootFolder: $defaultRadarrRootFolder)';
   }
 }
 
@@ -405,6 +422,7 @@ abstract mixin class _$SeerrCredentialsModelCopyWith<$Res>
       String sessionCookie,
       Map<String, String> customHeaders,
       bool enableQuickRequest,
+      bool enableKidsMode,
       int? defaultRadarrServerId,
       int? defaultRadarrProfileId,
       String? defaultRadarrRootFolder});
@@ -428,6 +446,7 @@ class __$SeerrCredentialsModelCopyWithImpl<$Res>
     Object? sessionCookie = null,
     Object? customHeaders = null,
     Object? enableQuickRequest = null,
+    Object? enableKidsMode = null,
     Object? defaultRadarrServerId = freezed,
     Object? defaultRadarrProfileId = freezed,
     Object? defaultRadarrRootFolder = freezed,
@@ -452,6 +471,10 @@ class __$SeerrCredentialsModelCopyWithImpl<$Res>
       enableQuickRequest: null == enableQuickRequest
           ? _self.enableQuickRequest
           : enableQuickRequest // ignore: cast_nullable_to_non_nullable
+              as bool,
+      enableKidsMode: null == enableKidsMode
+          ? _self.enableKidsMode
+          : enableKidsMode // ignore: cast_nullable_to_non_nullable
               as bool,
       defaultRadarrServerId: freezed == defaultRadarrServerId
           ? _self.defaultRadarrServerId

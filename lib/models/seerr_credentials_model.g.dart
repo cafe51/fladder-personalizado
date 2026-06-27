@@ -17,6 +17,7 @@ _SeerrCredentialsModel _$SeerrCredentialsModelFromJson(
           ) ??
           const {},
       enableQuickRequest: json['enableQuickRequest'] as bool? ?? false,
+      enableKidsMode: json['enableKidsMode'] as bool? ?? false,
       defaultRadarrServerId: (json['defaultRadarrServerId'] as num?)?.toInt(),
       defaultRadarrProfileId: (json['defaultRadarrProfileId'] as num?)?.toInt(),
       defaultRadarrRootFolder: json['defaultRadarrRootFolder'] as String?,
@@ -30,6 +31,7 @@ Map<String, dynamic> _$SeerrCredentialsModelToJson(
       'sessionCookie': instance.sessionCookie,
       'customHeaders': instance.customHeaders,
       'enableQuickRequest': instance.enableQuickRequest,
+      'enableKidsMode': instance.enableKidsMode,
       'defaultRadarrServerId': instance.defaultRadarrServerId,
       'defaultRadarrProfileId': instance.defaultRadarrProfileId,
       'defaultRadarrRootFolder': instance.defaultRadarrRootFolder,

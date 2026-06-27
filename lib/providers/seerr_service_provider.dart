@@ -351,6 +351,8 @@ class SeerrService {
     var results = response.body?.results ?? const <SeerrDiscoverItem>[];
     
     final clientSettings = ref.read(clientSettingsProvider);
+    final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
+
     if (clientSettings.seerrHideUnreleased) {
       final now = DateTime.now();
       final movieLimit = now.subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
@@ -370,6 +372,16 @@ class SeerrService {
           return date.isBefore(now) || date.isAtSameMomentAs(now);
         }
         return true;
+      }).toList();
+    }
+
+    if (isKidsMode) {
+      results = results.where((item) {
+        final genres = item.genreIds ?? [];
+        if (genres.isEmpty) return false;
+        final hasKidsGenre = genres.contains(16) || genres.contains(10751) || genres.contains(10762);
+        final hasAdultGenre = genres.contains(27) || genres.contains(80) || genres.contains(53);
+        return hasKidsGenre && !hasAdultGenre;
       }).toList();
     }
 
@@ -431,11 +443,14 @@ class SeerrService {
       primaryReleaseDateLte = "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}";
     }
 
+    final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
+
     final response = await _api.getDiscoverMovies(
       page: page,
       language: language,
       sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
       primaryReleaseDateLte: primaryReleaseDateLte,
+      genre: isKidsMode ? '16,10751' : null,
     );
     final results = response.body?.results ?? const <SeerrDiscoverItem>[];
     return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
@@ -449,11 +464,14 @@ class SeerrService {
       firstAirDateLte = "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}";
     }
 
+    final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
+
     final response = await _api.getDiscoverTv(
       page: page,
       language: language,
       sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
       firstAirDateLte: firstAirDateLte,
+      genre: isKidsMode ? '16,10751,10762' : null,
     );
     final results = response.body?.results ?? const <SeerrDiscoverItem>[];
     return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
@@ -607,7 +625,18 @@ class SeerrService {
     if (query.trim().isEmpty) return const [];
 
     final response = await _api.search(query: query, page: page, language: language);
-    final results = response.body?.results ?? const <SeerrDiscoverItem>[];
+    var results = response.body?.results ?? const <SeerrDiscoverItem>[];
+
+    final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
+    if (isKidsMode) {
+      results = results.where((item) {
+        final genres = item.genreIds ?? [];
+        if (genres.isEmpty) return false;
+        final hasKidsGenre = genres.contains(16) || genres.contains(10751) || genres.contains(10762);
+        final hasAdultGenre = genres.contains(27) || genres.contains(80) || genres.contains(53);
+        return hasKidsGenre && !hasAdultGenre;
+      }).toList();
+    }
 
     final items = <SeerrDashboardPosterModel>[];
     for (final result in results) {
@@ -659,16 +688,19 @@ class SeerrService {
     String? certificationMode,
   }) {
     final clientSettings = ref.read(clientSettingsProvider);
+    final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
     var finalPrimaryReleaseDateLte = primaryReleaseDateLte;
     if (clientSettings.seerrHideUnreleased && finalPrimaryReleaseDateLte == null) {
       final limitDate = DateTime.now().subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
       finalPrimaryReleaseDateLte = "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}";
     }
+    
+    final finalGenre = isKidsMode ? '16,10751' : genre;
 
     return _api.getDiscoverMovies(
       page: page,
       sortBy: sortBy,
-      genre: genre,
+      genre: finalGenre,
       studio: studio,
       primaryReleaseDateGte: primaryReleaseDateGte,
       primaryReleaseDateLte: finalPrimaryReleaseDateLte,
@@ -696,16 +728,19 @@ class SeerrService {
     String? watchProviders,
   }) {
     final clientSettings = ref.read(clientSettingsProvider);
+    final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
     var finalFirstAirDateLte = firstAirDateLte;
     if (clientSettings.seerrHideUnreleased && finalFirstAirDateLte == null) {
       final limitDate = DateTime.now();
       finalFirstAirDateLte = "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}";
     }
+    
+    final finalGenre = isKidsMode ? '16,10751,10762' : genre;
 
     return _api.getDiscoverTv(
       page: page,
       sortBy: sortBy,
-      genre: genre,
+      genre: finalGenre,
       firstAirDateGte: firstAirDateGte,
       firstAirDateLte: finalFirstAirDateLte,
       voteAverageGte: voteAverageGte,
