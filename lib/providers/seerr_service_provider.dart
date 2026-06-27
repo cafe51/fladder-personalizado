@@ -347,11 +347,31 @@ class SeerrService {
   }
 
   Future<List<SeerrDashboardPosterModel>> discoverTrending({int? page, String? language}) async {
-    final response = await _api.getDiscoverTrending(page: page, language: language);
-    var results = response.body?.results ?? const <SeerrDiscoverItem>[];
-    
     final clientSettings = ref.read(clientSettingsProvider);
     final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
+
+    if (isKidsMode) {
+      // TMDB trending endpoint does not support genre filtering natively.
+      // If we fetch trending and filter locally, we end up with 0 or 1 results per page.
+      // So for Kids Mode, we substitute the Trending row with a Discover Movies query.
+      final limitDate = DateTime.now().subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
+      final primaryReleaseDateLte = clientSettings.seerrHideUnreleased 
+          ? "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}" 
+          : null;
+          
+      final response = await _api.getDiscoverMovies(
+        page: page,
+        language: language,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+        primaryReleaseDateLte: primaryReleaseDateLte,
+        genre: '16,10751,10762',
+      );
+      final results = response.body?.results ?? const <SeerrDiscoverItem>[];
+      return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    }
+
+    final response = await _api.getDiscoverTrending(page: page, language: language);
+    var results = response.body?.results ?? const <SeerrDiscoverItem>[];
 
     if (clientSettings.seerrHideUnreleased) {
       final now = DateTime.now();
@@ -372,16 +392,6 @@ class SeerrService {
           return date.isBefore(now) || date.isAtSameMomentAs(now);
         }
         return true;
-      }).toList();
-    }
-
-    if (isKidsMode) {
-      results = results.where((item) {
-        final genres = item.genreIds ?? [];
-        if (genres.isEmpty) return false;
-        final hasKidsGenre = genres.contains(16) || genres.contains(10751) || genres.contains(10762);
-        final hasAdultGenre = genres.contains(27) || genres.contains(80) || genres.contains(53);
-        return hasKidsGenre && !hasAdultGenre;
       }).toList();
     }
 
