@@ -84,6 +84,37 @@ List<Widget> buildClientSettingsDashboard(BuildContext context, WidgetRef ref) {
               .update((current) => current.copyWith(showAllCollectionTypes: value)),
         ),
       ),
+      SettingsListTile(
+        label: const Text("Ocultar Lançamentos Recentes (Seerr)"),
+        subLabel: const Text("Esconde filmes que ainda não saíram do cinema e séries futuras."),
+        onTap: () => ref
+            .read(clientSettingsProvider.notifier)
+            .update((current) => current.copyWith(seerrHideUnreleased: !current.seerrHideUnreleased)),
+        trailing: Switch(
+          value: clientSettings.seerrHideUnreleased,
+          onChanged: (value) => ref
+              .read(clientSettingsProvider.notifier)
+              .update((current) => current.copyWith(seerrHideUnreleased: value)),
+        ),
+      ),
+      if (clientSettings.seerrHideUnreleased)
+        SettingsListTile(
+          label: const Text("Dias de Atraso para Filmes"),
+          subLabel: Text("Esconder filmes lançados nos últimos ${clientSettings.seerrDigitalReleaseDelay} dias."),
+          trailing: SizedBox(
+            width: 150,
+            child: Slider(
+              value: clientSettings.seerrDigitalReleaseDelay.toDouble(),
+              min: 0,
+              max: 90,
+              divisions: 90,
+              label: clientSettings.seerrDigitalReleaseDelay.toString(),
+              onChanged: (value) => ref
+                  .read(clientSettingsProvider.notifier)
+                  .update((current) => current.copyWith(seerrDigitalReleaseDelay: value.toInt())),
+            ),
+          ),
+        ),
     ],
   );
 }

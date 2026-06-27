@@ -8,7 +8,10 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:fladder/models/items/images_models.dart';
 import 'package:fladder/models/seerr/seerr_dashboard_model.dart';
 import 'package:fladder/providers/seerr_user_provider.dart';
+import 'package:fladder/providers/seerr/seerr_request_provider.dart';
+import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/routes/auto_router.gr.dart';
+import 'package:fladder/screens/shared/fladder_notification_overlay.dart';
 import 'package:fladder/screens/seerr/widgets/seerr_request_popup.dart';
 import 'package:fladder/seerr/seerr_models.dart';
 import 'package:fladder/theme.dart';
@@ -44,6 +47,20 @@ class SeerrPosterCard extends ConsumerWidget {
 
     final baseItemModel = poster.itemBaseModel;
 
+    final credentials = ref.read(userProvider)?.seerrCredentials;
+    final isQuickRequestEnabled = credentials?.enableQuickRequest == true && poster.type == SeerrMediaType.movie;
+
+    void handleRequestAction() async {
+      if (isQuickRequestEnabled) {
+        await FladderSnack.showResponse(
+          ref.read(seerrRequestProvider.notifier).submitQuickMovieRequest(poster),
+          successTitle: context.localized.requestedSuccessForItem(poster.title),
+        );
+      } else {
+        openSeerrRequestPopup(context, poster);
+      }
+    }
+
     void openRequestDetails() {
       context.router.push(
         SeerrDetailsRoute(
@@ -73,7 +90,7 @@ class SeerrPosterCard extends ConsumerWidget {
         ItemActionButton(
           icon: const Icon(IconsaxPlusBold.add),
           label: Text(context.localized.request),
-          action: () => openSeerrRequestPopup(context, poster),
+          action: handleRequestAction,
         ),
       if (baseItemModel != null)
         ItemActionButton(
@@ -134,7 +151,7 @@ class SeerrPosterCard extends ConsumerWidget {
                               padding: const EdgeInsets.symmetric(vertical: 6),
                               textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                             ),
-                            onPressed: () => openSeerrRequestPopup(context, poster),
+                            onPressed: handleRequestAction,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

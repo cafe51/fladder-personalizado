@@ -9,6 +9,7 @@ import 'package:fladder/models/items/images_models.dart';
 import 'package:fladder/models/seerr/seerr_dashboard_model.dart';
 import 'package:fladder/models/seerr/seerr_item_models.dart';
 import 'package:fladder/providers/user_provider.dart';
+import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/seerr/seerr_chopper_service.dart';
 import 'package:fladder/seerr/seerr_models.dart';
 
@@ -347,7 +348,31 @@ class SeerrService {
 
   Future<List<SeerrDashboardPosterModel>> discoverTrending({int? page, String? language}) async {
     final response = await _api.getDiscoverTrending(page: page, language: language);
-    final results = response.body?.results ?? const <SeerrDiscoverItem>[];
+    var results = response.body?.results ?? const <SeerrDiscoverItem>[];
+    
+    final clientSettings = ref.read(clientSettingsProvider);
+    if (clientSettings.seerrHideUnreleased) {
+      final now = DateTime.now();
+      final movieLimit = now.subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
+      results = results.where((item) {
+        final type = _resolveMediaType(item);
+        if (type == SeerrMediaType.movie) {
+          final dateStr = item.releaseDate;
+          if (dateStr == null || dateStr.isEmpty) return false;
+          final date = DateTime.tryParse(dateStr);
+          if (date == null) return false;
+          return date.isBefore(movieLimit) || date.isAtSameMomentAs(movieLimit);
+        } else if (type == SeerrMediaType.tvshow) {
+          final dateStr = item.firstAirDate;
+          if (dateStr == null || dateStr.isEmpty) return false;
+          final date = DateTime.tryParse(dateStr);
+          if (date == null) return false;
+          return date.isBefore(now) || date.isAtSameMomentAs(now);
+        }
+        return true;
+      }).toList();
+    }
+
     return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
   }
 
@@ -399,20 +424,36 @@ class SeerrService {
   }
 
   Future<List<SeerrDashboardPosterModel>> discoverPopularMovies({int? page, String? language}) async {
+    final clientSettings = ref.read(clientSettingsProvider);
+    String? primaryReleaseDateLte;
+    if (clientSettings.seerrHideUnreleased) {
+      final limitDate = DateTime.now().subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
+      primaryReleaseDateLte = "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}";
+    }
+
     final response = await _api.getDiscoverMovies(
       page: page,
       language: language,
       sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+      primaryReleaseDateLte: primaryReleaseDateLte,
     );
     final results = response.body?.results ?? const <SeerrDiscoverItem>[];
     return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
   }
 
   Future<List<SeerrDashboardPosterModel>> discoverPopularSeries({int? page, String? language}) async {
+    final clientSettings = ref.read(clientSettingsProvider);
+    String? firstAirDateLte;
+    if (clientSettings.seerrHideUnreleased) {
+      final limitDate = DateTime.now();
+      firstAirDateLte = "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}";
+    }
+
     final response = await _api.getDiscoverTv(
       page: page,
       language: language,
       sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+      firstAirDateLte: firstAirDateLte,
     );
     final results = response.body?.results ?? const <SeerrDiscoverItem>[];
     return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
@@ -616,24 +657,32 @@ class SeerrService {
     String? certification,
     String? certificationCountry,
     String? certificationMode,
-  }) =>
-      _api.getDiscoverMovies(
-        page: page,
-        sortBy: sortBy,
-        genre: genre,
-        studio: studio,
-        primaryReleaseDateGte: primaryReleaseDateGte,
-        primaryReleaseDateLte: primaryReleaseDateLte,
-        voteAverageGte: voteAverageGte,
-        voteAverageLte: voteAverageLte,
-        withRuntimeGte: withRuntimeGte,
-        withRuntimeLte: withRuntimeLte,
-        watchRegion: watchRegion,
-        watchProviders: watchProviders,
-        certification: certification,
-        certificationCountry: certificationCountry,
-        certificationMode: certificationMode,
-      );
+  }) {
+    final clientSettings = ref.read(clientSettingsProvider);
+    var finalPrimaryReleaseDateLte = primaryReleaseDateLte;
+    if (clientSettings.seerrHideUnreleased && finalPrimaryReleaseDateLte == null) {
+      final limitDate = DateTime.now().subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
+      finalPrimaryReleaseDateLte = "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}";
+    }
+
+    return _api.getDiscoverMovies(
+      page: page,
+      sortBy: sortBy,
+      genre: genre,
+      studio: studio,
+      primaryReleaseDateGte: primaryReleaseDateGte,
+      primaryReleaseDateLte: finalPrimaryReleaseDateLte,
+      voteAverageGte: voteAverageGte,
+      voteAverageLte: voteAverageLte,
+      withRuntimeGte: withRuntimeGte,
+      withRuntimeLte: withRuntimeLte,
+      watchRegion: watchRegion,
+      watchProviders: watchProviders,
+      certification: certification,
+      certificationCountry: certificationCountry,
+      certificationMode: certificationMode,
+    );
+  }
 
   Future<Response<SeerrDiscoverResponse>> discoverTv({
     int? page,
@@ -645,18 +694,26 @@ class SeerrService {
     double? voteAverageLte,
     String? watchRegion,
     String? watchProviders,
-  }) =>
-      _api.getDiscoverTv(
-        page: page,
-        sortBy: sortBy,
-        genre: genre,
-        firstAirDateGte: firstAirDateGte,
-        firstAirDateLte: firstAirDateLte,
-        voteAverageGte: voteAverageGte,
-        voteAverageLte: voteAverageLte,
-        watchRegion: watchRegion,
-        watchProviders: watchProviders,
-      );
+  }) {
+    final clientSettings = ref.read(clientSettingsProvider);
+    var finalFirstAirDateLte = firstAirDateLte;
+    if (clientSettings.seerrHideUnreleased && finalFirstAirDateLte == null) {
+      final limitDate = DateTime.now();
+      finalFirstAirDateLte = "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}";
+    }
+
+    return _api.getDiscoverTv(
+      page: page,
+      sortBy: sortBy,
+      genre: genre,
+      firstAirDateGte: firstAirDateGte,
+      firstAirDateLte: finalFirstAirDateLte,
+      voteAverageGte: voteAverageGte,
+      voteAverageLte: voteAverageLte,
+      watchRegion: watchRegion,
+      watchProviders: watchProviders,
+    );
+  }
 
   Future<Response<SeerrDiscoverResponse>> search({
     required String query,

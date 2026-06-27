@@ -15,7 +15,10 @@ import 'package:fladder/screens/seerr/widgets/download_status_label.dart';
 import 'package:fladder/screens/seerr/widgets/season_download_progress_widget.dart';
 import 'package:fladder/screens/seerr/widgets/seerr_poster_row.dart';
 import 'package:fladder/screens/seerr/widgets/seerr_request_popup.dart';
+import 'package:fladder/providers/seerr/seerr_request_provider.dart';
+import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/screens/seerr/widgets/seerr_requests_sheet.dart';
+import 'package:fladder/screens/shared/fladder_notification_overlay.dart';
 import 'package:fladder/screens/shared/detail_scaffold.dart';
 import 'package:fladder/screens/shared/media/expanding_text.dart';
 import 'package:fladder/screens/shared/media/external_urls.dart';
@@ -87,6 +90,21 @@ class SeerrDetailsScreen extends ConsumerWidget {
     final mainButtonLabel = currentPoster?.type == SeerrMediaType.movie
         ? context.localized.request
         : (canRequestMore ? context.localized.requestMore : context.localized.request);
+
+    final credentials = ref.read(userProvider)?.seerrCredentials;
+    final isQuickRequestEnabled = credentials?.enableQuickRequest == true && currentPoster?.type == SeerrMediaType.movie;
+
+    void handleRequestAction() async {
+      if (currentPoster == null) return;
+      if (isQuickRequestEnabled) {
+        await FladderSnack.showResponse(
+          ref.read(seerrRequestProvider.notifier).submitQuickMovieRequest(currentPoster),
+          successTitle: context.localized.requestedSuccessForItem(currentPoster.title),
+        );
+      } else {
+        openSeerrRequestPopup(context, currentPoster);
+      }
+    }
 
     return DetailScaffold(
       label: currentPoster?.title ?? context.localized.request,
@@ -185,7 +203,7 @@ class SeerrDetailsScreen extends ConsumerWidget {
                       builder: (context) {
                         return FocusButton(
                           autoFocus: AdaptiveLayout.inputDeviceOf(context) == InputDevice.dPad,
-                          onTap: canRequestMore ? () => openSeerrRequestPopup(context, currentPoster) : null,
+                          onTap: canRequestMore ? handleRequestAction : null,
                           borderRadius: radius,
                           onFocusChanged: (value) {
                             if (value) {

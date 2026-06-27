@@ -16,6 +16,10 @@ _SeerrCredentialsModel _$SeerrCredentialsModelFromJson(
             (k, e) => MapEntry(k, e as String),
           ) ??
           const {},
+      enableQuickRequest: json['enableQuickRequest'] as bool? ?? false,
+      defaultRadarrServerId: (json['defaultRadarrServerId'] as num?)?.toInt(),
+      defaultRadarrProfileId: (json['defaultRadarrProfileId'] as num?)?.toInt(),
+      defaultRadarrRootFolder: json['defaultRadarrRootFolder'] as String?,
     );
 
 Map<String, dynamic> _$SeerrCredentialsModelToJson(
@@ -25,4 +29,8 @@ Map<String, dynamic> _$SeerrCredentialsModelToJson(
       'apiKey': instance.apiKey,
       'sessionCookie': instance.sessionCookie,
       'customHeaders': instance.customHeaders,
+      'enableQuickRequest': instance.enableQuickRequest,
+      'defaultRadarrServerId': instance.defaultRadarrServerId,
+      'defaultRadarrProfileId': instance.defaultRadarrProfileId,
+      'defaultRadarrRootFolder': instance.defaultRadarrRootFolder,
     };

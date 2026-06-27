@@ -95,6 +95,8 @@ abstract class ClientSettingsModel with _$ClientSettingsModel {
     @Default(false) bool usePosterForLibrary,
     @Default(false) bool useSystemIME,
     @Default(false) bool useTVExpandedLayout,
+    @Default(false) bool seerrHideUnreleased,
+    @Default(45) int seerrDigitalReleaseDelay,
     String? lastViewedUpdate,
     int? libraryPageSize,
     @Default({}) Map<GlobalHotKeys, KeyCombination> shortcuts,

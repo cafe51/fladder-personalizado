@@ -18,6 +18,10 @@ mixin _$SeerrCredentialsModel {
   String get apiKey;
   String get sessionCookie;
   Map<String, String> get customHeaders;
+  bool get enableQuickRequest;
+  int? get defaultRadarrServerId;
+  int? get defaultRadarrProfileId;
+  String? get defaultRadarrRootFolder;
 
   /// Create a copy of SeerrCredentialsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -32,7 +36,7 @@ mixin _$SeerrCredentialsModel {
 
   @override
   String toString() {
-    return 'SeerrCredentialsModel(serverUrl: $serverUrl, apiKey: $apiKey, sessionCookie: $sessionCookie, customHeaders: $customHeaders)';
+    return 'SeerrCredentialsModel(serverUrl: $serverUrl, apiKey: $apiKey, sessionCookie: $sessionCookie, customHeaders: $customHeaders, enableQuickRequest: $enableQuickRequest, defaultRadarrServerId: $defaultRadarrServerId, defaultRadarrProfileId: $defaultRadarrProfileId, defaultRadarrRootFolder: $defaultRadarrRootFolder)';
   }
 }
 
@@ -46,7 +50,11 @@ abstract mixin class $SeerrCredentialsModelCopyWith<$Res> {
       {String serverUrl,
       String apiKey,
       String sessionCookie,
-      Map<String, String> customHeaders});
+      Map<String, String> customHeaders,
+      bool enableQuickRequest,
+      int? defaultRadarrServerId,
+      int? defaultRadarrProfileId,
+      String? defaultRadarrRootFolder});
 }
 
 /// @nodoc
@@ -66,6 +74,10 @@ class _$SeerrCredentialsModelCopyWithImpl<$Res>
     Object? apiKey = null,
     Object? sessionCookie = null,
     Object? customHeaders = null,
+    Object? enableQuickRequest = null,
+    Object? defaultRadarrServerId = freezed,
+    Object? defaultRadarrProfileId = freezed,
+    Object? defaultRadarrRootFolder = freezed,
   }) {
     return _then(_self.copyWith(
       serverUrl: null == serverUrl
@@ -84,6 +96,22 @@ class _$SeerrCredentialsModelCopyWithImpl<$Res>
           ? _self.customHeaders
           : customHeaders // ignore: cast_nullable_to_non_nullable
               as Map<String, String>,
+      enableQuickRequest: null == enableQuickRequest
+          ? _self.enableQuickRequest
+          : enableQuickRequest // ignore: cast_nullable_to_non_nullable
+              as bool,
+      defaultRadarrServerId: freezed == defaultRadarrServerId
+          ? _self.defaultRadarrServerId
+          : defaultRadarrServerId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      defaultRadarrProfileId: freezed == defaultRadarrProfileId
+          ? _self.defaultRadarrProfileId
+          : defaultRadarrProfileId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      defaultRadarrRootFolder: freezed == defaultRadarrRootFolder
+          ? _self.defaultRadarrRootFolder
+          : defaultRadarrRootFolder // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -181,16 +209,30 @@ extension SeerrCredentialsModelPatterns on SeerrCredentialsModel {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String serverUrl, String apiKey, String sessionCookie,
-            Map<String, String> customHeaders)?
+    TResult Function(
+            String serverUrl,
+            String apiKey,
+            String sessionCookie,
+            Map<String, String> customHeaders,
+            bool enableQuickRequest,
+            int? defaultRadarrServerId,
+            int? defaultRadarrProfileId,
+            String? defaultRadarrRootFolder)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _SeerrCredentialsModel() when $default != null:
-        return $default(_that.serverUrl, _that.apiKey, _that.sessionCookie,
-            _that.customHeaders);
+        return $default(
+            _that.serverUrl,
+            _that.apiKey,
+            _that.sessionCookie,
+            _that.customHeaders,
+            _that.enableQuickRequest,
+            _that.defaultRadarrServerId,
+            _that.defaultRadarrProfileId,
+            _that.defaultRadarrRootFolder);
       case _:
         return orElse();
     }
@@ -211,15 +253,29 @@ extension SeerrCredentialsModelPatterns on SeerrCredentialsModel {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String serverUrl, String apiKey, String sessionCookie,
-            Map<String, String> customHeaders)
+    TResult Function(
+            String serverUrl,
+            String apiKey,
+            String sessionCookie,
+            Map<String, String> customHeaders,
+            bool enableQuickRequest,
+            int? defaultRadarrServerId,
+            int? defaultRadarrProfileId,
+            String? defaultRadarrRootFolder)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _SeerrCredentialsModel():
-        return $default(_that.serverUrl, _that.apiKey, _that.sessionCookie,
-            _that.customHeaders);
+        return $default(
+            _that.serverUrl,
+            _that.apiKey,
+            _that.sessionCookie,
+            _that.customHeaders,
+            _that.enableQuickRequest,
+            _that.defaultRadarrServerId,
+            _that.defaultRadarrProfileId,
+            _that.defaultRadarrRootFolder);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -239,15 +295,29 @@ extension SeerrCredentialsModelPatterns on SeerrCredentialsModel {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String serverUrl, String apiKey, String sessionCookie,
-            Map<String, String> customHeaders)?
+    TResult? Function(
+            String serverUrl,
+            String apiKey,
+            String sessionCookie,
+            Map<String, String> customHeaders,
+            bool enableQuickRequest,
+            int? defaultRadarrServerId,
+            int? defaultRadarrProfileId,
+            String? defaultRadarrRootFolder)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _SeerrCredentialsModel() when $default != null:
-        return $default(_that.serverUrl, _that.apiKey, _that.sessionCookie,
-            _that.customHeaders);
+        return $default(
+            _that.serverUrl,
+            _that.apiKey,
+            _that.sessionCookie,
+            _that.customHeaders,
+            _that.enableQuickRequest,
+            _that.defaultRadarrServerId,
+            _that.defaultRadarrProfileId,
+            _that.defaultRadarrRootFolder);
       case _:
         return null;
     }
@@ -261,7 +331,11 @@ class _SeerrCredentialsModel extends SeerrCredentialsModel {
       {this.serverUrl = "",
       this.apiKey = "",
       this.sessionCookie = "",
-      final Map<String, String> customHeaders = const {}})
+      final Map<String, String> customHeaders = const {},
+      this.enableQuickRequest = false,
+      this.defaultRadarrServerId,
+      this.defaultRadarrProfileId,
+      this.defaultRadarrRootFolder})
       : _customHeaders = customHeaders,
         super._();
   factory _SeerrCredentialsModel.fromJson(Map<String, dynamic> json) =>
@@ -285,6 +359,16 @@ class _SeerrCredentialsModel extends SeerrCredentialsModel {
     return EqualUnmodifiableMapView(_customHeaders);
   }
 
+  @override
+  @JsonKey()
+  final bool enableQuickRequest;
+  @override
+  final int? defaultRadarrServerId;
+  @override
+  final int? defaultRadarrProfileId;
+  @override
+  final String? defaultRadarrRootFolder;
+
   /// Create a copy of SeerrCredentialsModel
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -303,7 +387,7 @@ class _SeerrCredentialsModel extends SeerrCredentialsModel {
 
   @override
   String toString() {
-    return 'SeerrCredentialsModel(serverUrl: $serverUrl, apiKey: $apiKey, sessionCookie: $sessionCookie, customHeaders: $customHeaders)';
+    return 'SeerrCredentialsModel(serverUrl: $serverUrl, apiKey: $apiKey, sessionCookie: $sessionCookie, customHeaders: $customHeaders, enableQuickRequest: $enableQuickRequest, defaultRadarrServerId: $defaultRadarrServerId, defaultRadarrProfileId: $defaultRadarrProfileId, defaultRadarrRootFolder: $defaultRadarrRootFolder)';
   }
 }
 
@@ -319,7 +403,11 @@ abstract mixin class _$SeerrCredentialsModelCopyWith<$Res>
       {String serverUrl,
       String apiKey,
       String sessionCookie,
-      Map<String, String> customHeaders});
+      Map<String, String> customHeaders,
+      bool enableQuickRequest,
+      int? defaultRadarrServerId,
+      int? defaultRadarrProfileId,
+      String? defaultRadarrRootFolder});
 }
 
 /// @nodoc
@@ -339,6 +427,10 @@ class __$SeerrCredentialsModelCopyWithImpl<$Res>
     Object? apiKey = null,
     Object? sessionCookie = null,
     Object? customHeaders = null,
+    Object? enableQuickRequest = null,
+    Object? defaultRadarrServerId = freezed,
+    Object? defaultRadarrProfileId = freezed,
+    Object? defaultRadarrRootFolder = freezed,
   }) {
     return _then(_SeerrCredentialsModel(
       serverUrl: null == serverUrl
@@ -357,6 +449,22 @@ class __$SeerrCredentialsModelCopyWithImpl<$Res>
           ? _self._customHeaders
           : customHeaders // ignore: cast_nullable_to_non_nullable
               as Map<String, String>,
+      enableQuickRequest: null == enableQuickRequest
+          ? _self.enableQuickRequest
+          : enableQuickRequest // ignore: cast_nullable_to_non_nullable
+              as bool,
+      defaultRadarrServerId: freezed == defaultRadarrServerId
+          ? _self.defaultRadarrServerId
+          : defaultRadarrServerId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      defaultRadarrProfileId: freezed == defaultRadarrProfileId
+          ? _self.defaultRadarrProfileId
+          : defaultRadarrProfileId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      defaultRadarrRootFolder: freezed == defaultRadarrRootFolder
+          ? _self.defaultRadarrRootFolder
+          : defaultRadarrRootFolder // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

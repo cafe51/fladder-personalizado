@@ -14,6 +14,10 @@ abstract class SeerrCredentialsModel with _$SeerrCredentialsModel {
     @Default("") String apiKey,
     @Default("") String sessionCookie,
     @Default({}) Map<String, String> customHeaders,
+    @Default(false) bool enableQuickRequest,
+    int? defaultRadarrServerId,
+    int? defaultRadarrProfileId,
+    String? defaultRadarrRootFolder,
   }) = _SeerrCredentialsModel;
 
   bool get isConfigured {

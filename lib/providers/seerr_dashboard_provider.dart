@@ -6,6 +6,7 @@ import 'package:fladder/providers/seerr_api_provider.dart';
 import 'package:fladder/providers/seerr_service_provider.dart';
 import 'package:fladder/providers/seerr_user_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
+import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/seerr/seerr_models.dart';
 
 part 'seerr_dashboard_provider.g.dart';
@@ -21,14 +22,15 @@ class SeerrDashboard extends _$SeerrDashboard {
 
   Future<void> fetchDashboard() async {
     await ref.read(seerrUserProvider.notifier).refreshUser();
+    final clientSettings = ref.read(clientSettingsProvider);
     await Future.wait([
       fetchRecentlyAdded(),
       fetchRecentRequests(),
       fetchTrending(),
       fetchPopularMovies(),
       fetchPopularSeries(),
-      fetchExpectedMovies(),
-      fetchExpectedSeries(),
+      if (!clientSettings.seerrHideUnreleased) fetchExpectedMovies(),
+      if (!clientSettings.seerrHideUnreleased) fetchExpectedSeries(),
     ]);
   }
 

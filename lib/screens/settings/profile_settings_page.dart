@@ -21,6 +21,7 @@ import 'package:fladder/screens/settings/settings_scaffold.dart';
 import 'package:fladder/screens/settings/widgets/home_preferences_editors.dart';
 import 'package:fladder/screens/settings/widgets/password_reset_dialog.dart';
 import 'package:fladder/screens/settings/widgets/seerr_connection_dialog.dart';
+import 'package:fladder/screens/settings/widgets/seerr_quick_request_dialog.dart';
 import 'package:fladder/screens/settings/widgets/settings_label_divider.dart';
 import 'package:fladder/screens/settings/widgets/settings_list_group.dart';
 import 'package:fladder/screens/settings/widgets/settings_message_box.dart';
@@ -108,6 +109,13 @@ class _UserSettingsPageState extends ConsumerState<ProfileSettingsPage> with Wid
     final cultures = ref.watch(culturesProvider);
     final clientSettings = ref.watch(clientSettingsProvider);
     final lastUpdateAt = ref.watch(notificationsProvider).updatedAt;
+
+    final hasAutoApproveMovie = seerrUser != null &&
+        (seerrUser.isAdmin ||
+            seerrUser.hasPermission(SeerrPermission.autoApprove) ||
+            seerrUser.hasPermission(SeerrPermission.autoApproveMovie));
+    final hasQuotaLimit = (seerrUser?.movieQuotaLimit != null && seerrUser!.movieQuotaLimit! > 0);
+    final canUseQuickRequest = hasAutoApproveMovie && !hasQuotaLimit;
 
     final allowedSubModes = {
       enums.SubtitlePlaybackMode.$default,
@@ -341,6 +349,12 @@ class _UserSettingsPageState extends ConsumerState<ProfileSettingsPage> with Wid
               subLabel: Text(_seerrStatusLabel(context, user?.seerrCredentials, seerrUser)),
               onTap: () => showSeerrConnectionDialog(context),
             ),
+            if (canUseQuickRequest)
+              SettingsListTile(
+                label: const Text("Serviço Padrão (Quick Request)"),
+                subLabel: const Text("Pular a janela de opções ao requisitar filmes"),
+                onTap: () => showSeerrQuickRequestDialog(context),
+              ),
             if (seerrUser?.canManageRequests ?? false)
               SettingsListTileCheckbox(
                 label: Text(context.localized.seerrRequestNotifications),

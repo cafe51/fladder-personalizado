@@ -38,8 +38,13 @@ class DownloadStatusLabel extends ConsumerWidget {
       }
     }
 
-    final hasDownloads = totalSize > 0;
-    final percentage = hasDownloads ? ((totalSize - totalRemaining) / totalSize) * 100 : 0.0;
+    final hasDownloads = relevantDownloads.isNotEmpty || totalSize > 0 || poster.mediaStatus == SeerrMediaStatus.processing;
+    final percentage = (hasDownloads && totalSize > 0) ? ((totalSize - totalRemaining) / totalSize) * 100 : 0.0;
+
+    String normalizeTitle(String? s) {
+      if (s == null) return '';
+      return s.toLowerCase().replaceAll(RegExp(r'[\.\-\_ \:]'), '');
+    }
 
     if (hasDownloads) {
       String downloadLabel = context.localized.processing;
@@ -59,13 +64,23 @@ class DownloadStatusLabel extends ConsumerWidget {
           }
           if (activeTorrent == null && download.title != null) {
               for (final t in transmissionTorrents) {
-                  if (t['name']?.toString().toLowerCase() == download.title?.toLowerCase()) {
+                  if (normalizeTitle(t['name']) == normalizeTitle(download.title)) {
                       activeTorrent = t as Map<String, dynamic>?;
                       break;
                   }
               }
           }
           if (activeTorrent != null) break;
+      }
+
+      // Seerr às vezes não tem o download ainda, mas está em processando. Tentar bater pelo título original em PT se o torrent tiver o mesmo nome (raro, mas fallback)
+      if (activeTorrent == null && poster.mediaStatus == SeerrMediaStatus.processing) {
+          for (final t in transmissionTorrents) {
+              if (normalizeTitle(t['name']).contains(normalizeTitle(poster.title))) {
+                  activeTorrent = t as Map<String, dynamic>?;
+                  break;
+              }
+          }
       }
 
       if (activeTorrent != null) {
@@ -113,14 +128,16 @@ class DownloadStatusLabel extends ConsumerWidget {
                 ),
               ),
             ),
-            Text(
-              downloadLabel,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.w600,
+            Flexible(
+              child: Text(
+                downloadLabel,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onPrimaryContainer,
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

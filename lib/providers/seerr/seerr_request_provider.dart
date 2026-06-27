@@ -6,6 +6,7 @@ import 'package:fladder/models/api_result.dart';
 import 'package:fladder/models/seerr/seerr_dashboard_model.dart';
 import 'package:fladder/providers/seerr_api_provider.dart';
 import 'package:fladder/providers/seerr_user_provider.dart';
+import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/seerr/seerr_models.dart';
 import 'package:fladder/util/seerr_helpers.dart';
 
@@ -233,6 +234,25 @@ class SeerrRequest extends _$SeerrRequest {
       ))
           .apiResult;
     }
+  }
+
+  Future<ApiResult<SeerrMediaRequest?>?> submitQuickMovieRequest(SeerrDashboardPosterModel poster) async {
+    final credentials = ref.read(userProvider)?.seerrCredentials;
+    if (credentials == null) return null;
+
+    final currentUserBody = state.currentUser ?? await ref.read(seerrUserProvider.notifier).refreshUser();
+    final userId = currentUserBody?.id;
+
+    return (await api.requestMovie(
+      tmdbId: poster.tmdbId,
+      is4k: false,
+      userId: userId,
+      serverId: credentials.defaultRadarrServerId,
+      profileId: credentials.defaultRadarrProfileId,
+      rootFolder: credentials.defaultRadarrRootFolder,
+      tags: [],
+    ))
+        .apiResult;
   }
 
   Future<void> deleteRequest() async {
