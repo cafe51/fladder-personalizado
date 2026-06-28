@@ -1,3 +1,4 @@
+import io.flutter.embedding.android.FlutterFragmentActivity
 package nl.jknaapen.fladder
 
 import BatteryOptimizationPigeon
@@ -19,7 +20,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
-import com.ryanheise.audioservice.AudioServiceFragmentActivity
+import com.ryanheise.audioservice.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import nl.jknaapen.fladder.objects.PlayerSettingsObject
 import nl.jknaapen.fladder.objects.TranslationsMessenger
@@ -33,7 +34,7 @@ import java.util.Objects
 
 class WallpaperFileProvider : FileProvider()
 
-class MainActivity : AudioServiceFragmentActivity(), NativeVideoActivity {
+class MainActivity : FlutterFragmentActivity(), NativeVideoActivity {
     private lateinit var videoPlayerLauncher: ActivityResultLauncher<Intent>
     private var videoPlayerCallback: ((Result<StartResult>) -> Unit)? = null
 
