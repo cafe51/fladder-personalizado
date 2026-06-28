@@ -73,8 +73,9 @@ Adicionar uma camada de segurança por conta de usuário, onde contas de crianç
 **Lógica Utilizada:**
 Como a API de Busca (Search) do Jellyseerr não recebe e nem retorna faixa etária (Livre, 12 anos, etc.), uma filtragem extra usando `genreIds` se provou a única alternativa inteligente, rápida e segura.
 Criou-se uma chave booleana salva localmente por conta de usuário (no provedor principal `userProvider`).
-- **Dashboard & Recomendações:** O Fladder injeta os gêneros 16 (Animação) e 10751 (Família) diretamente na API do TMDB/Jellyseerr. Toda a tela inicial é repovoada de forma nativa pela API para exibir apenas conteúdo infantil.
+- **Dashboard & Recomendações:** O Fladder injeta os gêneros 16 (Animação) e 10751 (Família) diretamente na API do TMDB/Jellyseerr. Toda a tela inicial é repovoada de forma nativa pela API para exibir apenas conteúdo infantil. Na seção de Tendências (Trending), que não suporta filtros de gêneros nativamente, o Fladder puxa secretamente a "Página 2" de Filmes Populares e a "Página 2" de Séries Populares, misturando-as dinamicamente para preservar a essência do "Trending" sem sobrepor os itens da página inicial.
 - **Barra de Busca (Search):** O Fladder intercepta os resultados no lado do cliente. Exigimos que o filme/série contenha ao menos um gênero infantil (16, 10751 ou 10762) para poder aparecer, e destruímos da lista qualquer resultado que possua gêneros inapropriados (como 27-Terror, 80-Crime ou 53-Thriller). O bloqueio de busca acontece na velocidade da luz (memória local) sem precisar de requisições N+1.
+- **Pedidos Recentes e Mídias Adicionadas:** Estas seções constroem imagens diretamente pelas IDs. O motor gerador de pôsteres (`fetchDashboardPosterFromIds`) foi blindado; caso ele detecte gêneros adultos no momento em que monta a imagem, ele aborta a renderização, ocultando completamente itens inapropriados das prateleiras de "Recentes".
 
 **Principais Arquivos Modificados:**
 - `lib/models/seerr_credentials_model.dart`: Adicionada a propriedade `enableKidsMode` vinculada ao usuário logado.
