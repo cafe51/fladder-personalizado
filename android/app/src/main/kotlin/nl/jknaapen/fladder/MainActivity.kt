@@ -1,4 +1,3 @@
-import io.flutter.embedding.android.FlutterFragmentActivity
 package nl.jknaapen.fladder
 
 import BatteryOptimizationPigeon
@@ -20,7 +19,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
-import com.ryanheise.audioservice.FlutterFragmentActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import nl.jknaapen.fladder.objects.PlayerSettingsObject
 import nl.jknaapen.fladder.objects.TranslationsMessenger
