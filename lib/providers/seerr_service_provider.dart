@@ -391,7 +391,8 @@ class SeerrService {
       final response = await _api.getDiscoverMovies(
         page: page,
         language: language,
-        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+        sortBy: SeerrSortBy.voteAverageDesc.valueForMode(SeerrSearchMode.discoverMovies),
+        voteCountGte: 500,
         primaryReleaseDateLte: primaryReleaseDateLte,
         genre: '16,10751,10762',
       );
