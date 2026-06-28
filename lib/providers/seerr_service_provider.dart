@@ -388,16 +388,29 @@ class SeerrService {
           ? "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}" 
           : null;
           
-      final response = await _api.getDiscoverMovies(
-        page: page,
+      final moviesResponse = await _api.getDiscoverMovies(
+        page: (page ?? 1) + 1, // Fetch next page to prevent overlap with Popular Movies
         language: language,
-        sortBy: SeerrSortBy.voteAverageDesc.valueForMode(SeerrSearchMode.discoverMovies),
-        voteCountGte: 500,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
         primaryReleaseDateLte: primaryReleaseDateLte,
+        genre: '16,10751',
+      );
+      
+      final seriesResponse = await _api.getDiscoverTv(
+        page: (page ?? 1) + 1, // Fetch next page to prevent overlap with Popular Series
+        language: language,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+        firstAirDateLte: primaryReleaseDateLte,
         genre: '16,10751,10762',
       );
-      final results = response.body?.results ?? const <SeerrDiscoverItem>[];
-      return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+      
+      final movies = moviesResponse.body?.results ?? const <SeerrDiscoverItem>[];
+      final series = seriesResponse.body?.results ?? const <SeerrDiscoverItem>[];
+      
+      final mixed = [...movies, ...series];
+      mixed.shuffle();
+      
+      return mixed.take(20).map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
     }
 
     final response = await _api.getDiscoverTrending(page: page, language: language);
