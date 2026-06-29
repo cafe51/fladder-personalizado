@@ -18,8 +18,6 @@ import 'package:fladder/util/duration_extensions.dart';
 import 'package:fladder/util/fladder_image.dart';
 import 'package:fladder/widgets/shared/fladder_slider.dart';
 import 'package:fladder/wrappers/players/base_player.dart';
-import 'package:fladder/wrappers/players/lib_mdk.dart'
-    if (dart.library.html) 'package:fladder/stubs/web/lib_mdk_web.dart';
 import 'package:fladder/wrappers/players/lib_mpv.dart';
 
 class SimpleVideoPlayer extends ConsumerStatefulWidget {
@@ -34,9 +32,9 @@ class SimpleVideoPlayer extends ConsumerStatefulWidget {
 
 class _SimpleVideoPlayerState extends ConsumerState<SimpleVideoPlayer> with WindowListener, WidgetsBindingObserver {
   late final BasePlayer player = switch (ref.read(videoPlayerSettingsProvider).wantedPlayer) {
-    PlayerOptions.libMDK => LibMDK(),
+    PlayerOptions.libMDK => LibMPV(),
     PlayerOptions.libMPV => LibMPV(),
-    _ => LibMDK(),
+    _ => LibMPV(),
   };
   late String videoUrl = "";
 
