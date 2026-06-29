@@ -7,8 +7,10 @@ import 'package:window_manager/window_manager.dart';
 import 'package:fladder/providers/arguments_provider.dart';
 import 'package:fladder/providers/connectivity_provider.dart';
 import 'package:fladder/util/adaptive_layout/adaptive_layout.dart';
+import 'package:fladder/util/refresh_state.dart';
 import 'package:fladder/widgets/full_screen_helpers/full_screen_wrapper.dart';
 import 'package:fladder/widgets/shared/offline_banner.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 
 class DefaultTitleBar extends ConsumerStatefulWidget {
   final String? label;
@@ -115,6 +117,28 @@ class _DefaultTitleBarState extends ConsumerState<DefaultTitleBar> with WindowLi
                                 ]),
                                 child: Row(
                                   children: [
+                                    IconButton(
+                                      focusNode: FocusNode(canRequestFocus: false, skipTraversal: true),
+                                      style: IconButton.styleFrom(
+                                          hoverColor: brightness == Brightness.light
+                                              ? Colors.black.withValues(alpha: 0.1)
+                                              : Colors.white.withValues(alpha: 0.2),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2))),
+                                      onPressed: () {
+                                        final focusContext = FocusManager.instance.primaryFocus?.context;
+                                        if (focusContext != null) {
+                                          focusContext.refreshData();
+                                        }
+                                      },
+                                      icon: Transform.translate(
+                                        offset: const Offset(0, -2),
+                                        child: Icon(
+                                          IconsaxPlusLinear.refresh,
+                                          color: iconColor,
+                                          size: 19,
+                                        ),
+                                      ),
+                                    ),
                                     FutureBuilder<List<bool>>(future: Future.microtask(() async {
                                       final isMinimized = await windowManager.isMinimized();
                                       return [isMinimized];
