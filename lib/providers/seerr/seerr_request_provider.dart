@@ -241,7 +241,8 @@ class SeerrRequest extends _$SeerrRequest {
     if (credentials == null) return null;
 
     final currentUserBody = state.currentUser ?? await ref.read(seerrUserProvider.notifier).refreshUser();
-    final userId = currentUserBody?.id;
+    final canOverrideUser = currentUserBody?.canManageUsers ?? false;
+    final userId = canOverrideUser ? currentUserBody?.id : null;
 
     return (await api.requestMovie(
       tmdbId: poster.tmdbId,
