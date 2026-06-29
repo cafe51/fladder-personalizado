@@ -70,7 +70,6 @@ Future<void> openSearchModeDialog(
                     onChanged: (_) {
                       Navigator.pop(dialogContext);
                       notifier.setSearchMode(mode);
-                      context.refreshData();
                     },
                     title: Row(
                       spacing: 8,

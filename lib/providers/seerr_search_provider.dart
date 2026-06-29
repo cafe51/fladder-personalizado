@@ -40,8 +40,16 @@ class SeerrSearch extends _$SeerrSearch {
     }
   }
 
-  Future<void> setSearchMode(SeerrSearchMode mode) async {
+  Future<void> setSearchModeWithoutSubmit(SeerrSearchMode mode) async {
     final query = mode != SeerrSearchMode.search ? '' : state.query;
+
+    state = state.copyWith(
+      searchMode: mode,
+      query: query,
+      currentPage: 1,
+      totalPages: null,
+      results: [],
+    );
 
     (Map<SeerrGenre, bool>, Map<SeerrWatchProvider, bool>, Map<SeerrCertification, bool>) currentFilters =
         (state.genres, state.watchProviders, state.certifications);
@@ -53,11 +61,6 @@ class SeerrSearch extends _$SeerrSearch {
     }
 
     state = state.copyWith(
-      searchMode: mode,
-      query: query,
-      currentPage: 1,
-      totalPages: null,
-      results: [],
       genres: currentFilters.$1,
       watchProviders: currentFilters.$2,
       certifications: currentFilters.$3,
@@ -67,6 +70,11 @@ class SeerrSearch extends _$SeerrSearch {
         certifications: currentFilters.$3,
       ),
     );
+  }
+
+  Future<void> setSearchMode(SeerrSearchMode mode) async {
+    await setSearchModeWithoutSubmit(mode);
+    await submit();
   }
 
   void setQuery(String value) {
@@ -89,6 +97,13 @@ class SeerrSearch extends _$SeerrSearch {
 
     state = state.copyWith(isLoading: true);
     await _fetchResults(page: 1, isLoadingMore: false);
+
+    if (state.totalPages != null && state.totalPages! > 1) {
+      await loadMore();
+      if (state.totalPages != null && state.totalPages! > 2) {
+        await loadMore();
+      }
+    }
   }
 
   Future<void> loadMore() async {

@@ -47,7 +47,6 @@ class _SeerrSearchScreenState extends ConsumerState<SeerrSearchScreen> {
   late final TextEditingController controller = TextEditingController();
   final GlobalKey<RefreshIndicatorState> refreshKey = GlobalKey<RefreshIndicatorState>();
   final ScrollController scrollController = ScrollController();
-  bool _forceSubmitOnRefresh = false;
 
   final Debouncer debouncer = Debouncer(const Duration(milliseconds: 500));
 
@@ -56,17 +55,21 @@ class _SeerrSearchScreenState extends ConsumerState<SeerrSearchScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final notifier = ref.read(seerrSearchProvider.notifier);
-      notifier.init();
+      await notifier.init();
+      
       if (widget.mode != null) {
-        notifier.setSearchMode(widget.mode!);
+        await notifier.setSearchModeWithoutSubmit(widget.mode!);
       }
+      
       if (widget.yearGte != null) {
-        notifier.setYearRange(minYear: widget.yearGte);
+        notifier.setYearRangeWithoutSubmit(minYear: widget.yearGte);
       }
+      
+      await notifier.submit();
+      
       scrollController.addListener(_onScroll);
-
       _maybeTriggerLoadMore();
     });
   }
@@ -74,7 +77,7 @@ class _SeerrSearchScreenState extends ConsumerState<SeerrSearchScreen> {
   void _onScroll() {
     if (!ref.read(seerrSearchProvider).canLoadMore) return;
     if (_isNearBottom(scrollController.position)) {
-      refreshKey.currentState?.show();
+      ref.read(seerrSearchProvider.notifier).loadMore();
     }
   }
 
@@ -83,24 +86,7 @@ class _SeerrSearchScreenState extends ConsumerState<SeerrSearchScreen> {
   }
 
   Future<void> _refreshSearch() async {
-    final state = ref.read(seerrSearchProvider);
     final notifier = ref.read(seerrSearchProvider.notifier);
-
-    if (_forceSubmitOnRefresh) {
-      _forceSubmitOnRefresh = false;
-      await notifier.submit();
-      return;
-    }
-
-    if (scrollController.hasClients && state.canLoadMore) {
-      final position = scrollController.position;
-      final notScrollable = position.maxScrollExtent <= 0;
-      if (notScrollable || _isNearBottom(position)) {
-        await notifier.loadMore();
-        return;
-      }
-    }
-
     await notifier.submit();
   }
 
@@ -109,7 +95,6 @@ class _SeerrSearchScreenState extends ConsumerState<SeerrSearchScreen> {
     if (value != null) {
       notifier.setQuery(value);
     }
-    _forceSubmitOnRefresh = true;
     refreshKey.currentState?.show();
   }
 
@@ -124,7 +109,7 @@ class _SeerrSearchScreenState extends ConsumerState<SeerrSearchScreen> {
     final nearBottom = _isNearBottom(position);
 
     if (notScrollable || nearBottom) {
-      refreshKey.currentState?.show();
+      ref.read(seerrSearchProvider.notifier).loadMore();
     }
   }
 
