@@ -719,8 +719,42 @@ class SeerrService {
 
   Future<Response<SeerrCertificationsResponse>> getTvCertifications() => _api.getTvCertifications();
 
-  Future<Response<SeerrDiscoverResponse>> discoverTrendingPaged({int? page, String? language}) =>
-      _api.getDiscoverTrending(page: page, language: language);
+  Future<Response<SeerrDiscoverResponse>> discoverTrendingPaged({int? page, String? language}) async {
+    final response = await _api.getDiscoverTrending(page: page, language: language);
+    
+    final clientSettings = ref.read(clientSettingsProvider);
+    if (!clientSettings.seerrHideUnreleased || !response.isSuccessful || response.body == null || response.body!.results == null) {
+      return response;
+    }
+
+    final limitDateMovies = DateTime.now().subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
+    final limitDateMoviesStr = "${limitDateMovies.year}-${limitDateMovies.month.toString().padLeft(2, '0')}-${limitDateMovies.day.toString().padLeft(2, '0')}";
+
+    final limitDateTv = DateTime.now();
+    final limitDateTvStr = "${limitDateTv.year}-${limitDateTv.month.toString().padLeft(2, '0')}-${limitDateTv.day.toString().padLeft(2, '0')}";
+
+    final filteredResults = response.body!.results!.where((item) {
+      if (item.mediaType == SeerrMediaType.movie) {
+        final releaseDate = item.releaseDate;
+        if (releaseDate == null || releaseDate.isEmpty) return false;
+        return releaseDate.compareTo(limitDateMoviesStr) <= 0;
+      } else if (item.mediaType == SeerrMediaType.tvshow) {
+        final firstAirDate = item.firstAirDate;
+        if (firstAirDate == null || firstAirDate.isEmpty) return false;
+        return firstAirDate.compareTo(limitDateTvStr) <= 0;
+      }
+      return true;
+    }).toList();
+
+    return response.copyWith(
+      body: SeerrDiscoverResponse(
+        results: filteredResults,
+        page: response.body!.page,
+        totalPages: response.body!.totalPages,
+        totalResults: response.body!.totalResults,
+      ),
+    );
+  }
 
   // Helper method for discover search
   Future<Response<SeerrDiscoverResponse>> discoverMovies({
