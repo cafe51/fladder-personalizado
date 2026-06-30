@@ -68,7 +68,7 @@ Future<AppBootstrapResult> bootstrapApplication(List<String> args) async {
   }
 
   final applicationInfo = ApplicationInfo(
-    name: packageInfo.appName.capitalize(),
+    name: "JAPHEFLIX",
     version: packageInfo.version,
     buildNumber: packageInfo.buildNumber,
     platform: defaultTargetPlatform,

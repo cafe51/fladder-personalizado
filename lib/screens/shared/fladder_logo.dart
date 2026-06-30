@@ -23,7 +23,7 @@ class FladderLogo extends ConsumerWidget {
         children: [
           const FladderIcon(),
           Text(
-            ref.read(applicationInfoProvider).name.capitalize(),
+            "JAPHEFLIX",
             style: context.textTheme.displayLarge,
             textAlign: TextAlign.center,
           )
