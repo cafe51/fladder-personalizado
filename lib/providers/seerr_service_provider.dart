@@ -143,6 +143,7 @@ class SeerrService {
     Map<int, SeerrMediaStatus>? seasonStatuses,
     String? releaseYear,
     SeerrRequestStatus? requestStatus,
+    double? popularity,
   }) {
     final keyPrefix = type == SeerrMediaType.movie ? 'tmdb_movie_$tmdbId' : 'tmdb_tv_$tmdbId';
     final id = type == SeerrMediaType.movie ? 'tmdb:movie:$tmdbId' : 'tmdb:tv:$tmdbId';
@@ -164,6 +165,7 @@ class SeerrService {
       seasonStatuses: seasonStatuses,
       mediaInfo: mediaInfo,
       releaseYear: releaseYear,
+      popularity: popularity,
     );
   }
 
@@ -195,6 +197,7 @@ class SeerrService {
       mediaStatus: credit.mediaInfo?.mediaStatus,
       mediaInfo: credit.mediaInfo,
       releaseYear: releaseYear,
+      popularity: credit.popularity,
     );
   }
 
@@ -388,33 +391,85 @@ class SeerrService {
           ? "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}" 
           : null;
           
-      final moviesResponse = await _api.getDiscoverMovies(
-        page: (page ?? 1) + 1, // Fetch next page to prevent overlap with Popular Movies
-        language: language,
-        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
-        primaryReleaseDateLte: primaryReleaseDateLte,
-        genre: '16,10751',
-      );
-      
-      final seriesResponse = await _api.getDiscoverTv(
-        page: (page ?? 1) + 1, // Fetch next page to prevent overlap with Popular Series
-        language: language,
-        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
-        firstAirDateLte: primaryReleaseDateLte,
-        genre: '16,10751,10762',
-      );
-      
-      final movies = moviesResponse.body?.results ?? const <SeerrDiscoverItem>[];
-      final series = seriesResponse.body?.results ?? const <SeerrDiscoverItem>[];
-      
-      final mixed = [...movies, ...series];
-      mixed.shuffle();
-      
-      return mixed.take(20).map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+      if (page == null) {
+        final moviesResponse1 = await _api.getDiscoverMovies(
+          page: 2,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+          primaryReleaseDateLte: primaryReleaseDateLte,
+          genre: '16,10751',
+        );
+        final moviesResponse2 = await _api.getDiscoverMovies(
+          page: 3,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+          primaryReleaseDateLte: primaryReleaseDateLte,
+          genre: '16,10751',
+        );
+        final seriesResponse1 = await _api.getDiscoverTv(
+          page: 2,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+          firstAirDateLte: primaryReleaseDateLte,
+          genre: '16,10751,10762',
+        );
+        final seriesResponse2 = await _api.getDiscoverTv(
+          page: 3,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+          firstAirDateLte: primaryReleaseDateLte,
+          genre: '16,10751,10762',
+        );
+        final movies = [
+          ...(moviesResponse1.body?.results ?? const <SeerrDiscoverItem>[]),
+          ...(moviesResponse2.body?.results ?? const <SeerrDiscoverItem>[]),
+        ];
+        final series = [
+          ...(seriesResponse1.body?.results ?? const <SeerrDiscoverItem>[]),
+          ...(seriesResponse2.body?.results ?? const <SeerrDiscoverItem>[]),
+        ];
+        final mixed = [...movies, ...series];
+        mixed.shuffle();
+        return mixed.take(40).map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+      } else {
+        final moviesResponse = await _api.getDiscoverMovies(
+          page: page + 1,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+          primaryReleaseDateLte: primaryReleaseDateLte,
+          genre: '16,10751',
+        );
+        
+        final seriesResponse = await _api.getDiscoverTv(
+          page: page + 1,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+          firstAirDateLte: primaryReleaseDateLte,
+          genre: '16,10751,10762',
+        );
+        
+        final movies = moviesResponse.body?.results ?? const <SeerrDiscoverItem>[];
+        final series = seriesResponse.body?.results ?? const <SeerrDiscoverItem>[];
+        
+        final mixed = [...movies, ...series];
+        mixed.shuffle();
+        
+        return mixed.take(20).map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+      }
     }
 
-    final response = await _api.getDiscoverTrending(page: page, language: language);
-    var results = response.body?.results ?? const <SeerrDiscoverItem>[];
+    var results = <SeerrDiscoverItem>[];
+    if (page == null) {
+      final response1 = await _api.getDiscoverTrending(page: 1, language: language);
+      final response2 = await _api.getDiscoverTrending(page: 2, language: language);
+      results = [
+        ...(response1.body?.results ?? const <SeerrDiscoverItem>[]),
+        ...(response2.body?.results ?? const <SeerrDiscoverItem>[]),
+      ];
+    } else {
+      final response = await _api.getDiscoverTrending(page: page, language: language);
+      results = response.body?.results ?? const <SeerrDiscoverItem>[];
+    }
 
     if (clientSettings.seerrHideUnreleased) {
       final now = DateTime.now();
@@ -485,6 +540,7 @@ class SeerrService {
       mediaStatus: item.mediaInfo?.status != null ? SeerrMediaStatus.fromRaw(item.mediaInfo?.status) : null,
       mediaInfo: item.mediaInfo,
       releaseYear: releaseYear,
+      popularity: item.popularity,
     );
   }
 
@@ -498,15 +554,37 @@ class SeerrService {
 
     final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
 
-    final response = await _api.getDiscoverMovies(
-      page: page,
-      language: language,
-      sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
-      primaryReleaseDateLte: primaryReleaseDateLte,
-      genre: isKidsMode ? '16,10751' : null,
-    );
-    final results = response.body?.results ?? const <SeerrDiscoverItem>[];
-    return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    if (page == null) {
+      final response1 = await _api.getDiscoverMovies(
+        page: 1,
+        language: language,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+        primaryReleaseDateLte: primaryReleaseDateLte,
+        genre: isKidsMode ? '16,10751' : null,
+      );
+      final response2 = await _api.getDiscoverMovies(
+        page: 2,
+        language: language,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+        primaryReleaseDateLte: primaryReleaseDateLte,
+        genre: isKidsMode ? '16,10751' : null,
+      );
+      final results = [
+        ...(response1.body?.results ?? const <SeerrDiscoverItem>[]),
+        ...(response2.body?.results ?? const <SeerrDiscoverItem>[]),
+      ];
+      return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    } else {
+      final response = await _api.getDiscoverMovies(
+        page: page,
+        language: language,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+        primaryReleaseDateLte: primaryReleaseDateLte,
+        genre: isKidsMode ? '16,10751' : null,
+      );
+      final results = response.body?.results ?? const <SeerrDiscoverItem>[];
+      return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    }
   }
 
   Future<List<SeerrDashboardPosterModel>> discoverPopularSeries({int? page, String? language}) async {
@@ -519,15 +597,37 @@ class SeerrService {
 
     final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
 
-    final response = await _api.getDiscoverTv(
-      page: page,
-      language: language,
-      sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
-      firstAirDateLte: firstAirDateLte,
-      genre: isKidsMode ? '16,10751,10762' : null,
-    );
-    final results = response.body?.results ?? const <SeerrDiscoverItem>[];
-    return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    if (page == null) {
+      final response1 = await _api.getDiscoverTv(
+        page: 1,
+        language: language,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+        firstAirDateLte: firstAirDateLte,
+        genre: isKidsMode ? '16,10751,10762' : null,
+      );
+      final response2 = await _api.getDiscoverTv(
+        page: 2,
+        language: language,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+        firstAirDateLte: firstAirDateLte,
+        genre: isKidsMode ? '16,10751,10762' : null,
+      );
+      final results = [
+        ...(response1.body?.results ?? const <SeerrDiscoverItem>[]),
+        ...(response2.body?.results ?? const <SeerrDiscoverItem>[]),
+      ];
+      return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    } else {
+      final response = await _api.getDiscoverTv(
+        page: page,
+        language: language,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+        firstAirDateLte: firstAirDateLte,
+        genre: isKidsMode ? '16,10751,10762' : null,
+      );
+      final results = response.body?.results ?? const <SeerrDiscoverItem>[];
+      return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    }
   }
 
   Future<List<SeerrDashboardPosterModel>> discoverExpectedMovies({int? page, String? language}) async {
@@ -719,42 +819,8 @@ class SeerrService {
 
   Future<Response<SeerrCertificationsResponse>> getTvCertifications() => _api.getTvCertifications();
 
-  Future<Response<SeerrDiscoverResponse>> discoverTrendingPaged({int? page, String? language}) async {
-    final response = await _api.getDiscoverTrending(page: page, language: language);
-    
-    final clientSettings = ref.read(clientSettingsProvider);
-    if (!clientSettings.seerrHideUnreleased || !response.isSuccessful || response.body == null || response.body!.results == null) {
-      return response;
-    }
-
-    final limitDateMovies = DateTime.now().subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
-    final limitDateMoviesStr = "${limitDateMovies.year}-${limitDateMovies.month.toString().padLeft(2, '0')}-${limitDateMovies.day.toString().padLeft(2, '0')}";
-
-    final limitDateTv = DateTime.now();
-    final limitDateTvStr = "${limitDateTv.year}-${limitDateTv.month.toString().padLeft(2, '0')}-${limitDateTv.day.toString().padLeft(2, '0')}";
-
-    final filteredResults = response.body!.results!.where((item) {
-      if (item.mediaType == SeerrMediaType.movie) {
-        final releaseDate = item.releaseDate;
-        if (releaseDate == null || releaseDate.isEmpty) return false;
-        return releaseDate.compareTo(limitDateMoviesStr) <= 0;
-      } else if (item.mediaType == SeerrMediaType.tvshow) {
-        final firstAirDate = item.firstAirDate;
-        if (firstAirDate == null || firstAirDate.isEmpty) return false;
-        return firstAirDate.compareTo(limitDateTvStr) <= 0;
-      }
-      return true;
-    }).toList();
-
-    return response.copyWith(
-      body: SeerrDiscoverResponse(
-        results: filteredResults,
-        page: response.body!.page,
-        totalPages: response.body!.totalPages,
-        totalResults: response.body!.totalResults,
-      ),
-    );
-  }
+  Future<Response<SeerrDiscoverResponse>> discoverTrendingPaged({int? page, String? language}) =>
+      _api.getDiscoverTrending(page: page, language: language);
 
   // Helper method for discover search
   Future<Response<SeerrDiscoverResponse>> discoverMovies({

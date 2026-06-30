@@ -130,6 +130,7 @@ class SeerrDashboardPosterModel {
   final String? releaseYear;
   final dynamic requestedBy;
   final List<int>? requestedSeasons;
+  final double? popularity;
 
   const SeerrDashboardPosterModel({
     required this.id,
@@ -147,6 +148,7 @@ class SeerrDashboardPosterModel {
     this.releaseYear,
     this.requestedBy,
     this.requestedSeasons,
+    this.popularity,
   });
 
   SeerrDashboardPosterModel copyWith({
@@ -165,6 +167,7 @@ class SeerrDashboardPosterModel {
     String? releaseYear,
     dynamic requestedBy,
     List<int>? requestedSeasons,
+    double? popularity,
   }) {
     return SeerrDashboardPosterModel(
       id: id ?? this.id,
@@ -182,6 +185,7 @@ class SeerrDashboardPosterModel {
       releaseYear: releaseYear ?? this.releaseYear,
       requestedBy: requestedBy ?? this.requestedBy,
       requestedSeasons: requestedSeasons ?? this.requestedSeasons,
+      popularity: popularity ?? this.popularity,
     );
   }
 

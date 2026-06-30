@@ -17,11 +17,13 @@ class Chapter {
   final String imageUrl;
   final Uint8List? imageData;
   final Duration startPosition;
+  final bool hasImage;
   Chapter({
     required this.name,
     required this.imageUrl,
     this.imageData,
     required this.startPosition,
+    this.hasImage = true,
   });
 
   ImageProvider get imageProvider {
@@ -47,7 +49,8 @@ class Chapter {
         .mapIndexed((index, element) => Chapter(
             name: element.name ?? "",
             imageUrl: ref.read(imageUtilityProvider).getChapterUrl(itemId, index),
-            startPosition: Duration(milliseconds: (element.startPositionTicks ?? 0) ~/ 10000)))
+            startPosition: Duration(milliseconds: (element.startPositionTicks ?? 0) ~/ 10000),
+            hasImage: element.imageTag != null))
         .toList();
   }
 
@@ -55,11 +58,13 @@ class Chapter {
     String? name,
     String? imageUrl,
     Duration? startPosition,
+    bool? hasImage,
   }) {
     return Chapter(
       name: name ?? this.name,
       imageUrl: imageUrl ?? this.imageUrl,
       startPosition: startPosition ?? this.startPosition,
+      hasImage: hasImage ?? this.hasImage,
     );
   }
 
@@ -68,6 +73,7 @@ class Chapter {
       'name': name,
       'imageUrl': imageUrl,
       'startPosition': startPosition.inMilliseconds,
+      'hasImage': hasImage,
     };
   }
 
@@ -76,6 +82,7 @@ class Chapter {
       name: map['name'] ?? '',
       imageUrl: map['imageUrl'] ?? '',
       startPosition: Duration(milliseconds: map['startPosition'] as int),
+      hasImage: map['hasImage'] ?? true,
     );
   }
 

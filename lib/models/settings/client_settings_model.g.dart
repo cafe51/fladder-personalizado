@@ -66,6 +66,7 @@ _ClientSettingsModel _$ClientSettingsModelFromJson(Map<String, dynamic> json) =>
           (json['seerrDigitalReleaseDelay'] as num?)?.toInt() ?? 45,
       lastViewedUpdate: json['lastViewedUpdate'] as String?,
       libraryPageSize: (json['libraryPageSize'] as num?)?.toInt(),
+      tmdbApiKey: json['tmdbApiKey'] as String?,
       shortcuts: (json['shortcuts'] as Map<String, dynamic>?)?.map(
             (k, e) => MapEntry($enumDecode(_$GlobalHotKeysEnumMap, k),
                 KeyCombination.fromJson(e as Map<String, dynamic>)),
@@ -111,6 +112,7 @@ Map<String, dynamic> _$ClientSettingsModelToJson(
       'seerrDigitalReleaseDelay': instance.seerrDigitalReleaseDelay,
       'lastViewedUpdate': instance.lastViewedUpdate,
       'libraryPageSize': instance.libraryPageSize,
+      'tmdbApiKey': instance.tmdbApiKey,
       'shortcuts': instance.shortcuts
           .map((k, e) => MapEntry(_$GlobalHotKeysEnumMap[k]!, e)),
     };

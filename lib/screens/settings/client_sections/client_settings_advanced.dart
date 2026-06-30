@@ -18,6 +18,43 @@ List<Widget> buildClientSettingsAdvanced(BuildContext context, WidgetRef ref) {
     SettingsLabelDivider(label: context.localized.advanced),
     [
       SettingsListTile(
+        label: const Text('TMDB API Key'),
+        subLabel: const Text('Used to fetch movie scene carousels and images.'),
+        onTap: () async {
+          final String? key = await showDialog<String>(
+            context: context,
+            builder: (context) {
+              final controller = TextEditingController(
+                text: ref.read(clientSettingsProvider.select((value) => value.tmdbApiKey)) ?? '',
+              );
+              return AlertDialog(
+                title: const Text('TMDB API Key'),
+                content: TextField(
+                  controller: controller,
+                  decoration: const InputDecoration(
+                    hintText: 'Paste your TMDB API Key here',
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(null),
+                    child: Text(context.localized.cancel),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.of(context).pop(controller.text),
+                    child: const Text('Save'),
+                  ),
+                ],
+              );
+            },
+          );
+          if (key != null) {
+            ref.read(clientSettingsProvider.notifier).update((current) => current.copyWith(tmdbApiKey: key));
+          }
+        },
+        trailing: const Icon(IconsaxPlusLinear.key),
+      ),
+      SettingsListTile(
         label: Text(context.localized.settingsLayoutSizesTitle),
         subLabel: Text(context.localized.settingsLayoutSizesDesc),
         onTap: () async {

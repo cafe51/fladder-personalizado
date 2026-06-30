@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:fladder/models/seerr/seerr_dashboard_model.dart';
 import 'package:fladder/providers/seerr_api_provider.dart';
@@ -9,6 +10,10 @@ import 'package:fladder/util/map_bool_helper.dart';
 
 part 'seerr_search_provider.freezed.dart';
 part 'seerr_search_provider.g.dart';
+
+enum SeerrSearchMediaTypeFilter { all, movie, tv }
+
+final seerrSearchMediaTypeFilterProvider = StateProvider<SeerrSearchMediaTypeFilter>((ref) => SeerrSearchMediaTypeFilter.all);
 
 @riverpod
 class SeerrSearch extends _$SeerrSearch {
@@ -120,15 +125,57 @@ class SeerrSearch extends _$SeerrSearch {
       final api = ref.read(seerrApiProvider);
       List<SeerrDashboardPosterModel> items = [];
       int? totalPages;
-
       switch (state.searchMode) {
         case SeerrSearchMode.search:
           final response = await api.search(query: state.query, page: page);
           final results = response.body?.results ?? [];
           totalPages = response.body?.totalPages;
+          final seenIds = <int>{};
+
+          // First pass: collect non-person results
           for (final result in results) {
-            final poster = api.posterFromDiscoverItem(result);
-            if (poster != null) items.add(poster);
+            if (result.mediaType != SeerrMediaType.person) {
+              final poster = api.posterFromDiscoverItem(result);
+              if (poster != null && seenIds.add(poster.tmdbId)) {
+                items.add(poster);
+              }
+            }
+          }
+
+          // Second pass: for person results, fetch their full combined credits
+          for (final result in results) {
+            if (result.mediaType == SeerrMediaType.person && result.id != null) {
+              try {
+                final creditsResponse = await api.personCombinedCredits(personId: result.id!);
+                if (creditsResponse.isSuccessful && creditsResponse.body != null) {
+                  final credits = creditsResponse.body!;
+                  // Add cast credits (actor roles)
+                  for (final credit in credits.cast ?? <SeerrPersonCredit>[]) {
+                    final poster = api.posterFromPersonCredit(credit);
+                    if (poster != null && seenIds.add(poster.tmdbId)) {
+                      items.add(poster);
+                    }
+                  }
+                  // Add crew credits (director, writer, etc.) - deduplicated
+                  for (final credit in credits.crew ?? <SeerrPersonCredit>[]) {
+                    final poster = api.posterFromPersonCredit(credit);
+                    if (poster != null && seenIds.add(poster.tmdbId)) {
+                      items.add(poster);
+                    }
+                  }
+                }
+              } catch (_) {
+                // Fallback to knownFor if credits fetch fails
+                if (result.knownFor != null) {
+                  for (final knownItem in result.knownFor!) {
+                    final poster = api.posterFromDiscoverItem(knownItem);
+                    if (poster != null && seenIds.add(poster.tmdbId)) {
+                      items.add(poster);
+                    }
+                  }
+                }
+              }
+            }
           }
           break;
 
@@ -190,15 +237,20 @@ class SeerrSearch extends _$SeerrSearch {
           break;
       }
 
+      final finalResults = isLoadingMore ? [...state.results, ...items] : items;
+      if (state.searchMode == SeerrSearchMode.search) {
+        finalResults.sort((a, b) => (b.popularity ?? 0.0).compareTo(a.popularity ?? 0.0));
+      }
+
       if (isLoadingMore) {
         state = state.copyWith(
-          results: [...state.results, ...items],
+          results: finalResults,
           currentPage: page,
           isLoadingMore: false,
         );
       } else {
         state = state.copyWith(
-          results: items,
+          results: finalResults,
           isLoading: false,
           currentPage: page,
           totalPages: totalPages,
@@ -422,6 +474,7 @@ class SeerrSearch extends _$SeerrSearch {
   }
 
   void clearFilters() {
+    ref.read(seerrSearchMediaTypeFilterProvider.notifier).state = SeerrSearchMediaTypeFilter.all;
     final clearedGenres = state.genres.setAll(false);
     final clearedWatchProviders = state.watchProviders.setAll(false);
     final clearedCertifications = state.certifications.setAll(false);

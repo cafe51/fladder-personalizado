@@ -176,7 +176,7 @@ class _ItemDetailScreenState extends ConsumerState<EpisodeDetailScreen> {
                     ExpandingText(
                       text: episodeDetails.overview.summary,
                     ).padding(padding),
-                  if (episodeDetails.chapters.isNotEmpty)
+                  if (episodeDetails.chapters.isNotEmpty && episodeDetails.chapters.any((c) => c.hasImage))
                     ChapterRow(
                       chapters: episodeDetails.chapters,
                       contentPadding: padding,

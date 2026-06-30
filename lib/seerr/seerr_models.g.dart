@@ -721,6 +721,10 @@ SeerrDiscoverItem _$SeerrDiscoverItemFromJson(Map<String, dynamic> json) =>
       genreIds: (json['genreIds'] as List<dynamic>?)
           ?.map((e) => (e as num).toInt())
           .toList(),
+      knownFor: (json['knownFor'] as List<dynamic>?)
+          ?.map((e) => SeerrDiscoverItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      popularity: (json['popularity'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$SeerrDiscoverItemToJson(SeerrDiscoverItem instance) =>
@@ -739,6 +743,8 @@ Map<String, dynamic> _$SeerrDiscoverItemToJson(SeerrDiscoverItem instance) =>
       'mediaInfo': instance.mediaInfo,
       'mediaId': instance.mediaId,
       'genreIds': instance.genreIds,
+      'knownFor': instance.knownFor,
+      'popularity': instance.popularity,
     };
 
 const _$SeerrMediaTypeEnumMap = {

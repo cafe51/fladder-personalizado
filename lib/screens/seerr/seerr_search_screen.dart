@@ -139,11 +139,15 @@ class _SeerrSearchScreenState extends ConsumerState<SeerrSearchScreen> {
       },
     );
 
-    final searchResults = searchState.results;
+    final mediaFilter = ref.watch(seerrSearchMediaTypeFilterProvider);
+    final searchResults = searchState.results.where((item) {
+      if (mediaFilter == SeerrSearchMediaTypeFilter.all) return true;
+      if (mediaFilter == SeerrSearchMediaTypeFilter.movie) return item.type == SeerrMediaType.movie;
+      if (mediaFilter == SeerrSearchMediaTypeFilter.tv) return item.type == SeerrMediaType.tvshow;
+      return true;
+    }).toList();
 
-    if (backgroundImages.isEmpty) {
-      backgroundImages = searchResults.map((e) => e.images).nonNulls.toList(growable: false);
-    }
+    backgroundImages = searchResults.map((e) => e.images).nonNulls.toList(growable: false);
 
     final floatingAppBar = AdaptiveLayout.layoutModeOf(context) != LayoutMode.single;
 

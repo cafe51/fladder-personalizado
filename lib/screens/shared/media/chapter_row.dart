@@ -72,6 +72,16 @@ class ChapterRow extends ConsumerWidget {
                 imageUrl: chapter.imageUrl,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => const Icon(IconsaxPlusBold.image),
+                errorWidget: (context, url, error) => Container(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: const Center(
+                    child: Icon(
+                      IconsaxPlusLinear.image,
+                      color: Colors.grey,
+                      size: 32,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

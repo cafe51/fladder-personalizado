@@ -273,12 +273,97 @@ class LibrarySearchNotifier extends StateNotifier<LibrarySearchModel> {
       int? startIndex,
       String? searchTerm}) async {
     final searchString = searchTerm ?? (state.searchQuery.isNotEmpty ? state.searchQuery : null);
+
+    if (searchString != null && searchString.isNotEmpty) {
+      final fieldsList = {
+        ItemFields.genres,
+        ItemFields.parentid,
+        ItemFields.tags,
+        ItemFields.datecreated,
+        ItemFields.datelastmediaadded,
+        ItemFields.overview,
+        ItemFields.originaltitle,
+        ItemFields.customrating,
+        ItemFields.primaryimageaspectratio,
+        if (viewModel?.collectionType == CollectionType.tvshows) ItemFields.childcount,
+      }.toList();
+
+      final filtersList = [
+        ...state.filters.itemFilters.included,
+        if (state.filters.favourites == true) ItemFilter.isfavorite,
+      ];
+
+      final itemTypes = state.filters.types.included.map((e) => e.dtoKind).toList();
+      final studioIdsList = state.filters.studios.included.map((e) => e.id).toList();
+      final sortByList = shuffle == true ? [ItemSortBy.random] : state.filters.sortingOption.toSortBy;
+
+      final responses = await Future.wait([
+        api.itemsGet(
+          parentId: viewModel?.id ?? id,
+          searchTerm: searchString,
+          genres: state.filters.genres.included,
+          tags: state.filters.tags.included,
+          recursive: true,
+          officialRatings: state.filters.officialRatings.included,
+          years: state.filters.years.included,
+          isMissing: false,
+          limit: (limit ?? 0) > 0 ? limit : null,
+          startIndex: (limit ?? 0) > 0 ? startIndex : null,
+          collapseBoxSetItems: false,
+          studioIds: studioIdsList,
+          sortBy: sortByList,
+          sortOrder: [state.filters.sortOrder.sortOrder],
+          fields: fieldsList,
+          filters: filtersList,
+          includeItemTypes: itemTypes,
+        ),
+        api.itemsGet(
+          parentId: viewModel?.id ?? id,
+          person: searchString,
+          genres: state.filters.genres.included,
+          tags: state.filters.tags.included,
+          recursive: true,
+          officialRatings: state.filters.officialRatings.included,
+          years: state.filters.years.included,
+          isMissing: false,
+          limit: (limit ?? 0) > 0 ? limit : null,
+          startIndex: (limit ?? 0) > 0 ? startIndex : null,
+          collapseBoxSetItems: false,
+          studioIds: studioIdsList,
+          sortBy: sortByList,
+          sortOrder: [state.filters.sortOrder.sortOrder],
+          fields: fieldsList,
+          filters: filtersList,
+          includeItemTypes: itemTypes,
+        ),
+      ]);
+
+      final response1 = responses[0];
+      final response2 = responses[1];
+
+      final items1 = response1.body?.items ?? [];
+      final items2 = response2.body?.items ?? [];
+
+      final allItems = [...items1];
+      final existingIds = allItems.map((e) => e.id).toSet();
+      for (final item in items2) {
+        if (!existingIds.contains(item.id)) {
+          allItems.add(item);
+        }
+      }
+
+      return response1.body?.copyWith(
+        items: allItems,
+        totalRecordCount: allItems.length,
+      ) ?? response2.body;
+    }
+
     final response = await api.itemsGet(
       parentId: viewModel?.id ?? id,
       searchTerm: searchString,
       genres: state.filters.genres.included,
       tags: state.filters.tags.included,
-      recursive: searchString?.isNotEmpty == true ? true : recursive ?? state.filters.recursive,
+      recursive: recursive ?? state.filters.recursive,
       officialRatings: state.filters.officialRatings.included,
       years: state.filters.years.included,
       isMissing: false,

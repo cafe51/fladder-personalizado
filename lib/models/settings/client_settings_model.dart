@@ -99,6 +99,7 @@ abstract class ClientSettingsModel with _$ClientSettingsModel {
     @Default(45) int seerrDigitalReleaseDelay,
     String? lastViewedUpdate,
     int? libraryPageSize,
+    String? tmdbApiKey,
     @Default({}) Map<GlobalHotKeys, KeyCombination> shortcuts,
   }) = _ClientSettingsModel;
 

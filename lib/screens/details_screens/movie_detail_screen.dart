@@ -10,6 +10,7 @@ import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/screens/details_screens/components/media_stream_information.dart';
 import 'package:fladder/screens/details_screens/components/overview_header.dart';
 import 'package:fladder/screens/seerr/widgets/seerr_poster_row.dart';
+import 'package:fladder/screens/seerr/widgets/tmdb_images_carousel.dart';
 import 'package:fladder/screens/shared/detail_scaffold.dart';
 import 'package:fladder/screens/shared/media/chapter_row.dart';
 import 'package:fladder/screens/shared/media/components/media_play_button.dart';
@@ -154,11 +155,22 @@ class _ItemDetailScreenState extends ConsumerState<MovieDetailScreen> {
                           )
                         : null,
                   ),
-                  if (details.overview.summary.isNotEmpty == true)
+                   if (details.overview.summary.isNotEmpty == true)
                     ExpandingText(
                       text: details.overview.summary,
                     ).padding(padding),
-                  if (details.chapters.isNotEmpty)
+                  if (details.providerIds?['Tmdb'] != null)
+                    Builder(builder: (context) {
+                      final tmdbIdStr = details.providerIds?['Tmdb'];
+                      final tmdbId = tmdbIdStr != null ? int.tryParse(tmdbIdStr.toString()) : null;
+                      if (tmdbId == null) return const SizedBox.shrink();
+                      return TmdbImagesCarousel(
+                        tmdbId: tmdbId,
+                        mediaType: 'movie',
+                        padding: padding,
+                      );
+                    }),
+                  if (details.chapters.isNotEmpty && details.chapters.any((c) => c.hasImage))
                     ChapterRow(
                       chapters: details.chapters,
                       contentPadding: padding,

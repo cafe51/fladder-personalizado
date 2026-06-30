@@ -49,6 +49,7 @@ mixin _$ClientSettingsModel implements DiagnosticableTreeMixin {
   int get seerrDigitalReleaseDelay;
   String? get lastViewedUpdate;
   int? get libraryPageSize;
+  String? get tmdbApiKey;
   Map<GlobalHotKeys, KeyCombination> get shortcuts;
 
   /// Create a copy of ClientSettingsModel
@@ -106,12 +107,13 @@ mixin _$ClientSettingsModel implements DiagnosticableTreeMixin {
           'seerrDigitalReleaseDelay', seerrDigitalReleaseDelay))
       ..add(DiagnosticsProperty('lastViewedUpdate', lastViewedUpdate))
       ..add(DiagnosticsProperty('libraryPageSize', libraryPageSize))
+      ..add(DiagnosticsProperty('tmdbApiKey', tmdbApiKey))
       ..add(DiagnosticsProperty('shortcuts', shortcuts));
   }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ClientSettingsModel(syncPath: $syncPath, transcodeDownloadModel: $transcodeDownloadModel, transcodeMusicDownloadModel: $transcodeMusicDownloadModel, position: $position, size: $size, timeOut: $timeOut, nextUpDateCutoff: $nextUpDateCutoff, updateNotificationsInterval: $updateNotificationsInterval, themeMode: $themeMode, themeColor: $themeColor, deriveColorsFromItem: $deriveColorsFromItem, amoledBlack: $amoledBlack, blurPlaceHolders: $blurPlaceHolders, blurUpcomingEpisodes: $blurUpcomingEpisodes, selectedLocale: $selectedLocale, enableMediaKeys: $enableMediaKeys, posterSize: $posterSize, pinchPosterZoom: $pinchPosterZoom, mouseDragSupport: $mouseDragSupport, requireWifi: $requireWifi, expandSideBar: $expandSideBar, showAllCollectionTypes: $showAllCollectionTypes, maxConcurrentDownloads: $maxConcurrentDownloads, schemeVariant: $schemeVariant, backgroundImage: $backgroundImage, enableBlurEffects: $enableBlurEffects, checkForUpdates: $checkForUpdates, usePosterForLibrary: $usePosterForLibrary, useSystemIME: $useSystemIME, useTVExpandedLayout: $useTVExpandedLayout, seerrHideUnreleased: $seerrHideUnreleased, seerrDigitalReleaseDelay: $seerrDigitalReleaseDelay, lastViewedUpdate: $lastViewedUpdate, libraryPageSize: $libraryPageSize, shortcuts: $shortcuts)';
+    return 'ClientSettingsModel(syncPath: $syncPath, transcodeDownloadModel: $transcodeDownloadModel, transcodeMusicDownloadModel: $transcodeMusicDownloadModel, position: $position, size: $size, timeOut: $timeOut, nextUpDateCutoff: $nextUpDateCutoff, updateNotificationsInterval: $updateNotificationsInterval, themeMode: $themeMode, themeColor: $themeColor, deriveColorsFromItem: $deriveColorsFromItem, amoledBlack: $amoledBlack, blurPlaceHolders: $blurPlaceHolders, blurUpcomingEpisodes: $blurUpcomingEpisodes, selectedLocale: $selectedLocale, enableMediaKeys: $enableMediaKeys, posterSize: $posterSize, pinchPosterZoom: $pinchPosterZoom, mouseDragSupport: $mouseDragSupport, requireWifi: $requireWifi, expandSideBar: $expandSideBar, showAllCollectionTypes: $showAllCollectionTypes, maxConcurrentDownloads: $maxConcurrentDownloads, schemeVariant: $schemeVariant, backgroundImage: $backgroundImage, enableBlurEffects: $enableBlurEffects, checkForUpdates: $checkForUpdates, usePosterForLibrary: $usePosterForLibrary, useSystemIME: $useSystemIME, useTVExpandedLayout: $useTVExpandedLayout, seerrHideUnreleased: $seerrHideUnreleased, seerrDigitalReleaseDelay: $seerrDigitalReleaseDelay, lastViewedUpdate: $lastViewedUpdate, libraryPageSize: $libraryPageSize, tmdbApiKey: $tmdbApiKey, shortcuts: $shortcuts)';
   }
 }
 
@@ -156,6 +158,7 @@ abstract mixin class $ClientSettingsModelCopyWith<$Res> {
       int seerrDigitalReleaseDelay,
       String? lastViewedUpdate,
       int? libraryPageSize,
+      String? tmdbApiKey,
       Map<GlobalHotKeys, KeyCombination> shortcuts});
 
   $TranscodeDownloadModelCopyWith<$Res> get transcodeDownloadModel;
@@ -208,6 +211,7 @@ class _$ClientSettingsModelCopyWithImpl<$Res>
     Object? seerrDigitalReleaseDelay = null,
     Object? lastViewedUpdate = freezed,
     Object? libraryPageSize = freezed,
+    Object? tmdbApiKey = freezed,
     Object? shortcuts = null,
   }) {
     return _then(_self.copyWith(
@@ -347,6 +351,10 @@ class _$ClientSettingsModelCopyWithImpl<$Res>
           ? _self.libraryPageSize
           : libraryPageSize // ignore: cast_nullable_to_non_nullable
               as int?,
+      tmdbApiKey: freezed == tmdbApiKey
+          ? _self.tmdbApiKey
+          : tmdbApiKey // ignore: cast_nullable_to_non_nullable
+              as String?,
       shortcuts: null == shortcuts
           ? _self.shortcuts
           : shortcuts // ignore: cast_nullable_to_non_nullable
@@ -494,6 +502,7 @@ extension ClientSettingsModelPatterns on ClientSettingsModel {
             int seerrDigitalReleaseDelay,
             String? lastViewedUpdate,
             int? libraryPageSize,
+            String? tmdbApiKey,
             Map<GlobalHotKeys, KeyCombination> shortcuts)?
         internal,
     required TResult orElse(),
@@ -536,6 +545,7 @@ extension ClientSettingsModelPatterns on ClientSettingsModel {
             _that.seerrDigitalReleaseDelay,
             _that.lastViewedUpdate,
             _that.libraryPageSize,
+            _that.tmdbApiKey,
             _that.shortcuts);
       case _:
         return orElse();
@@ -592,6 +602,7 @@ extension ClientSettingsModelPatterns on ClientSettingsModel {
             int seerrDigitalReleaseDelay,
             String? lastViewedUpdate,
             int? libraryPageSize,
+            String? tmdbApiKey,
             Map<GlobalHotKeys, KeyCombination> shortcuts)
         internal,
   }) {
@@ -633,6 +644,7 @@ extension ClientSettingsModelPatterns on ClientSettingsModel {
             _that.seerrDigitalReleaseDelay,
             _that.lastViewedUpdate,
             _that.libraryPageSize,
+            _that.tmdbApiKey,
             _that.shortcuts);
       case _:
         throw StateError('Unexpected subclass');
@@ -688,6 +700,7 @@ extension ClientSettingsModelPatterns on ClientSettingsModel {
             int seerrDigitalReleaseDelay,
             String? lastViewedUpdate,
             int? libraryPageSize,
+            String? tmdbApiKey,
             Map<GlobalHotKeys, KeyCombination> shortcuts)?
         internal,
   }) {
@@ -729,6 +742,7 @@ extension ClientSettingsModelPatterns on ClientSettingsModel {
             _that.seerrDigitalReleaseDelay,
             _that.lastViewedUpdate,
             _that.libraryPageSize,
+            _that.tmdbApiKey,
             _that.shortcuts);
       case _:
         return null;
@@ -775,6 +789,7 @@ class _ClientSettingsModel extends ClientSettingsModel
       this.seerrDigitalReleaseDelay = 45,
       this.lastViewedUpdate,
       this.libraryPageSize,
+      this.tmdbApiKey,
       final Map<GlobalHotKeys, KeyCombination> shortcuts = const {}})
       : _shortcuts = shortcuts,
         super._();
@@ -877,6 +892,8 @@ class _ClientSettingsModel extends ClientSettingsModel
   final String? lastViewedUpdate;
   @override
   final int? libraryPageSize;
+  @override
+  final String? tmdbApiKey;
   final Map<GlobalHotKeys, KeyCombination> _shortcuts;
   @override
   @JsonKey()
@@ -946,12 +963,13 @@ class _ClientSettingsModel extends ClientSettingsModel
           'seerrDigitalReleaseDelay', seerrDigitalReleaseDelay))
       ..add(DiagnosticsProperty('lastViewedUpdate', lastViewedUpdate))
       ..add(DiagnosticsProperty('libraryPageSize', libraryPageSize))
+      ..add(DiagnosticsProperty('tmdbApiKey', tmdbApiKey))
       ..add(DiagnosticsProperty('shortcuts', shortcuts));
   }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ClientSettingsModel.internal(syncPath: $syncPath, transcodeDownloadModel: $transcodeDownloadModel, transcodeMusicDownloadModel: $transcodeMusicDownloadModel, position: $position, size: $size, timeOut: $timeOut, nextUpDateCutoff: $nextUpDateCutoff, updateNotificationsInterval: $updateNotificationsInterval, themeMode: $themeMode, themeColor: $themeColor, deriveColorsFromItem: $deriveColorsFromItem, amoledBlack: $amoledBlack, blurPlaceHolders: $blurPlaceHolders, blurUpcomingEpisodes: $blurUpcomingEpisodes, selectedLocale: $selectedLocale, enableMediaKeys: $enableMediaKeys, posterSize: $posterSize, pinchPosterZoom: $pinchPosterZoom, mouseDragSupport: $mouseDragSupport, requireWifi: $requireWifi, expandSideBar: $expandSideBar, showAllCollectionTypes: $showAllCollectionTypes, maxConcurrentDownloads: $maxConcurrentDownloads, schemeVariant: $schemeVariant, backgroundImage: $backgroundImage, enableBlurEffects: $enableBlurEffects, checkForUpdates: $checkForUpdates, usePosterForLibrary: $usePosterForLibrary, useSystemIME: $useSystemIME, useTVExpandedLayout: $useTVExpandedLayout, seerrHideUnreleased: $seerrHideUnreleased, seerrDigitalReleaseDelay: $seerrDigitalReleaseDelay, lastViewedUpdate: $lastViewedUpdate, libraryPageSize: $libraryPageSize, shortcuts: $shortcuts)';
+    return 'ClientSettingsModel.internal(syncPath: $syncPath, transcodeDownloadModel: $transcodeDownloadModel, transcodeMusicDownloadModel: $transcodeMusicDownloadModel, position: $position, size: $size, timeOut: $timeOut, nextUpDateCutoff: $nextUpDateCutoff, updateNotificationsInterval: $updateNotificationsInterval, themeMode: $themeMode, themeColor: $themeColor, deriveColorsFromItem: $deriveColorsFromItem, amoledBlack: $amoledBlack, blurPlaceHolders: $blurPlaceHolders, blurUpcomingEpisodes: $blurUpcomingEpisodes, selectedLocale: $selectedLocale, enableMediaKeys: $enableMediaKeys, posterSize: $posterSize, pinchPosterZoom: $pinchPosterZoom, mouseDragSupport: $mouseDragSupport, requireWifi: $requireWifi, expandSideBar: $expandSideBar, showAllCollectionTypes: $showAllCollectionTypes, maxConcurrentDownloads: $maxConcurrentDownloads, schemeVariant: $schemeVariant, backgroundImage: $backgroundImage, enableBlurEffects: $enableBlurEffects, checkForUpdates: $checkForUpdates, usePosterForLibrary: $usePosterForLibrary, useSystemIME: $useSystemIME, useTVExpandedLayout: $useTVExpandedLayout, seerrHideUnreleased: $seerrHideUnreleased, seerrDigitalReleaseDelay: $seerrDigitalReleaseDelay, lastViewedUpdate: $lastViewedUpdate, libraryPageSize: $libraryPageSize, tmdbApiKey: $tmdbApiKey, shortcuts: $shortcuts)';
   }
 }
 
@@ -998,6 +1016,7 @@ abstract mixin class _$ClientSettingsModelCopyWith<$Res>
       int seerrDigitalReleaseDelay,
       String? lastViewedUpdate,
       int? libraryPageSize,
+      String? tmdbApiKey,
       Map<GlobalHotKeys, KeyCombination> shortcuts});
 
   @override
@@ -1051,6 +1070,7 @@ class __$ClientSettingsModelCopyWithImpl<$Res>
     Object? seerrDigitalReleaseDelay = null,
     Object? lastViewedUpdate = freezed,
     Object? libraryPageSize = freezed,
+    Object? tmdbApiKey = freezed,
     Object? shortcuts = null,
   }) {
     return _then(_ClientSettingsModel(
@@ -1190,6 +1210,10 @@ class __$ClientSettingsModelCopyWithImpl<$Res>
           ? _self.libraryPageSize
           : libraryPageSize // ignore: cast_nullable_to_non_nullable
               as int?,
+      tmdbApiKey: freezed == tmdbApiKey
+          ? _self.tmdbApiKey
+          : tmdbApiKey // ignore: cast_nullable_to_non_nullable
+              as String?,
       shortcuts: null == shortcuts
           ? _self._shortcuts
           : shortcuts // ignore: cast_nullable_to_non_nullable

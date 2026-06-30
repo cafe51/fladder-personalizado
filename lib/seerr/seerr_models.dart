@@ -1245,6 +1245,9 @@ class SeerrDiscoverItem {
   final String? mediaId;
   @JsonKey(name: 'genreIds')
   final List<int>? genreIds;
+  @JsonKey(name: 'knownFor')
+  final List<SeerrDiscoverItem>? knownFor;
+  final double? popularity;
 
   SeerrDiscoverItem({
     this.id,
@@ -1261,6 +1264,8 @@ class SeerrDiscoverItem {
     this.mediaInfo,
     this.mediaId,
     this.genreIds,
+    this.knownFor,
+    this.popularity,
   });
 
   factory SeerrDiscoverItem.fromJson(Map<String, dynamic> json) => _$SeerrDiscoverItemFromJson(json);
@@ -1302,6 +1307,7 @@ class SeerrPersonCredit {
   final String? character;
   final String? job;
   final String? department;
+  final double? popularity;
 
   SeerrPersonCredit({
     this.id,
@@ -1317,6 +1323,7 @@ class SeerrPersonCredit {
     this.character,
     this.job,
     this.department,
+    this.popularity,
   });
 
   factory SeerrPersonCredit.fromJson(Map<String, dynamic> json) {
@@ -1334,6 +1341,7 @@ class SeerrPersonCredit {
       character: json['character'] as String?,
       job: json['job'] as String?,
       department: json['department'] as String?,
+      popularity: (json['popularity'] as num?)?.toDouble(),
     );
   }
 
@@ -1351,6 +1359,7 @@ class SeerrPersonCredit {
         'character': character,
         'job': job,
         'department': department,
+        'popularity': popularity,
       };
 }
 

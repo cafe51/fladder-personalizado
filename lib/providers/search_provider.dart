@@ -19,14 +19,26 @@ class SearchNotifier extends StateNotifier<SearchModel> {
   Future<Response?> searchQuery() async {
     if (state.searchQuery.isEmpty) return null;
     state = state.copyWith(loading: true);
-    final response = await api.itemsGet(
-      recursive: true,
-      searchTerm: state.searchQuery,
-    );
+    final results = await Future.wait([
+      api.itemsGet(recursive: true, searchTerm: state.searchQuery),
+      api.itemsGet(recursive: true, person: state.searchQuery),
+    ]);
+    final response = results[0];
+    final personResponse = results[1];
+
+    final mainItems = response.body?.items ?? [];
+    final personItems = personResponse.body?.items ?? [];
+    final allItems = [...mainItems];
+    final existingIds = allItems.map((e) => e.id).toSet();
+    for (final item in personItems) {
+      if (!existingIds.contains(item.id)) {
+        allItems.add(item);
+      }
+    }
 
     state = state.copyWith(
-      resultCount: response.body?.totalRecordCount ?? 0,
-      results: (response.body?.items)?.groupedItems,
+      resultCount: allItems.length,
+      results: allItems.groupedItems,
     );
     state = state.copyWith(loading: false);
     return response;

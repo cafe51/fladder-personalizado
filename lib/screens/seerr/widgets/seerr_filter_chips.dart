@@ -27,8 +27,32 @@ class SeerrFilterChips extends ConsumerWidget {
     final watchRegions = searchState.watchProviderRegions;
     final selectedWatchProviders = filters.watchProviders.values.where((v) => v).length;
     final showFilters = searchMode == SeerrSearchMode.discoverMovies || searchMode == SeerrSearchMode.discoverTv;
+    final mediaFilter = ref.watch(seerrSearchMediaTypeFilterProvider);
 
     final chips = [
+      if (searchMode == SeerrSearchMode.search)
+        ExpressiveButtonGroup<SeerrSearchMediaTypeFilter>(
+          options: [
+            ButtonGroupOption(
+              value: SeerrSearchMediaTypeFilter.all,
+              child: Text(context.localized.all),
+            ),
+            ButtonGroupOption(
+              value: SeerrSearchMediaTypeFilter.movie,
+              child: Text(context.localized.mediaTypeMovie(2)),
+            ),
+            ButtonGroupOption(
+              value: SeerrSearchMediaTypeFilter.tv,
+              child: Text(context.localized.mediaTypeSeries(2)),
+            ),
+          ],
+          selectedValues: {mediaFilter},
+          onSelected: (values) {
+            if (values.isNotEmpty) {
+              ref.read(seerrSearchMediaTypeFilterProvider.notifier).state = values.first;
+            }
+          },
+        ),
       if (showFilters) ...[
         if (filters.genres.isNotEmpty)
           CategoryChip<SeerrGenre>(

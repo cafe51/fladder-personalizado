@@ -15,6 +15,7 @@ import 'package:fladder/screens/seerr/widgets/download_status_label.dart';
 import 'package:fladder/screens/seerr/widgets/season_download_progress_widget.dart';
 import 'package:fladder/screens/seerr/widgets/seerr_poster_row.dart';
 import 'package:fladder/screens/seerr/widgets/seerr_request_popup.dart';
+import 'package:fladder/screens/seerr/widgets/tmdb_images_carousel.dart';
 import 'package:fladder/providers/seerr/seerr_request_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/screens/seerr/widgets/seerr_requests_sheet.dart';
@@ -385,6 +386,11 @@ class SeerrDetailsScreen extends ConsumerWidget {
                         ? context.localized.noOverviewAvailable
                         : currentPoster.overview,
                   ).padding(padding),
+                  TmdbImagesCarousel(
+                    tmdbId: tmdbId,
+                    mediaType: mediaType,
+                    padding: padding,
+                  ),
                   if (currentPoster.type == SeerrMediaType.tvshow && (currentPoster.seasons?.isNotEmpty ?? false))
                     _SeerrSeasonsSection(
                       state: state,
