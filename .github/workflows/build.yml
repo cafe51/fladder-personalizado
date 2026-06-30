@@ -315,7 +315,11 @@ jobs:
       - name: Ensure correct app name casing
         run: |
           APP_DIR="build/macos/Build/Products/Release-production"
-          mv "$APP_DIR/fladder.app" "$APP_DIR/Fladder.app"
+          # Find whatever .app was built and rename it to JAPHEFLIX.app if needed
+          BUILT_APP=$(find "$APP_DIR" -maxdepth 1 -name "*.app" | head -n 1)
+          if [ -n "$BUILT_APP" ] && [ "$BUILT_APP" != "$APP_DIR/JAPHEFLIX.app" ]; then
+            mv "$BUILT_APP" "$APP_DIR/JAPHEFLIX.app"
+          fi
 
       - name: Install create-dmg
         run: brew install create-dmg
