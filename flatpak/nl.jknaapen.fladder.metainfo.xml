@@ -3,7 +3,7 @@
   <id>nl.jknaapen.fladder</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
-  <name>Fladder</name>
+  <name>JAPHEFLIX</name>
   <summary>A cross-platform Jellyfin client</summary>
 
   <branding>
@@ -13,7 +13,7 @@
   
   <description>
     <p>
-      Fladder is a modern, cross-platform Jellyfin client that provides a seamless
+      JAPHEFLIX is a modern, cross-platform Jellyfin client that provides a seamless
       media streaming experience. Built with Flutter, it offers a beautiful and
       intuitive interface for accessing your Jellyfin media library.
     </p>
@@ -66,9 +66,9 @@
   </content_rating>
   
   <releases>
-    <release version="0.10.3" date="2026-04-13">
+    <release version="0.10.17" date="2026-06-30">
       <description>
-        <p>See the full changelog at: https://github.com/DonutWare/Fladder/releases/tag/v0.10.3</p>
+        <p>See the full changelog at: https://github.com/cafe51/fladder-personalizado/releases/tag/v0.10.17</p>
       </description>
     </release>
   </releases>
