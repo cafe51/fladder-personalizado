@@ -471,29 +471,35 @@ class SeerrService {
       results = response.body?.results ?? const <SeerrDiscoverItem>[];
     }
 
-    if (clientSettings.seerrHideUnreleased) {
-      final now = DateTime.now();
-      final movieLimit = now.subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
-      results = results.where((item) {
-        final type = _resolveMediaType(item);
-        if (type == SeerrMediaType.movie) {
-          final dateStr = item.releaseDate;
-          if (dateStr == null || dateStr.isEmpty) return false;
-          final date = DateTime.tryParse(dateStr);
-          if (date == null) return false;
-          return date.isBefore(movieLimit) || date.isAtSameMomentAs(movieLimit);
-        } else if (type == SeerrMediaType.tvshow) {
-          final dateStr = item.firstAirDate;
-          if (dateStr == null || dateStr.isEmpty) return false;
-          final date = DateTime.tryParse(dateStr);
-          if (date == null) return false;
-          return date.isBefore(now) || date.isAtSameMomentAs(now);
-        }
-        return true;
-      }).toList();
-    }
+    results = _filterUnreleased(results);
 
     return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+  }
+
+  List<SeerrDiscoverItem> _filterUnreleased(List<SeerrDiscoverItem> items) {
+    final clientSettings = ref.read(clientSettingsProvider);
+    if (!clientSettings.seerrHideUnreleased) return items;
+
+    final now = DateTime.now();
+    final movieLimit = now.subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
+
+    return items.where((item) {
+      final type = _resolveMediaType(item);
+      if (type == SeerrMediaType.movie) {
+        final dateStr = item.releaseDate;
+        if (dateStr == null || dateStr.isEmpty) return false;
+        final date = DateTime.tryParse(dateStr);
+        if (date == null) return false;
+        return date.isBefore(movieLimit) || date.isAtSameMomentAs(movieLimit);
+      } else if (type == SeerrMediaType.tvshow) {
+        final dateStr = item.firstAirDate;
+        if (dateStr == null || dateStr.isEmpty) return false;
+        final date = DateTime.tryParse(dateStr);
+        if (date == null) return false;
+        return date.isBefore(now) || date.isAtSameMomentAs(now);
+      }
+      return true;
+    }).toList();
   }
 
   SeerrMediaType? _resolveMediaType(SeerrDiscoverItem item) {
@@ -790,6 +796,8 @@ class SeerrService {
         return hasKidsGenre && !hasAdultGenre;
       }).toList();
     }
+
+    results = _filterUnreleased(results);
 
     final items = <SeerrDashboardPosterModel>[];
     for (final result in results) {

@@ -606,6 +606,10 @@ class SeerrMovieDetails {
   final String? mediaId;
   @JsonKey(readValue: _readContentRatings)
   final List<SeerrContentRating>? contentRatings;
+  @JsonKey(readValue: _readDigitalReleaseDate)
+  final String? digitalReleaseDate;
+  @JsonKey(readValue: _readPhysicalReleaseDate)
+  final String? physicalReleaseDate;
 
   SeerrMovieDetails({
     this.id,
@@ -625,6 +629,8 @@ class SeerrMovieDetails {
     this.credits,
     this.mediaId,
     this.contentRatings,
+    this.digitalReleaseDate,
+    this.physicalReleaseDate,
   });
 
   factory SeerrMovieDetails.fromJson(Map<String, dynamic> json) => _$SeerrMovieDetailsFromJson(json);
@@ -851,6 +857,78 @@ Object? _readContentRatings(Map json, String key) {
     }
   }
 
+  return null;
+}
+
+Object? _readDigitalReleaseDate(Map json, String key) {
+  final releases = json['releases'];
+  if (releases == null || releases is! Map) return null;
+  final results = releases['results'];
+  if (results is! List) return null;
+
+  DateTime? earliestDigital;
+
+  for (final country in results) {
+    if (country is! Map) continue;
+    final releaseDates = country['release_dates'];
+    if (releaseDates is! List) continue;
+
+    for (final dateInfo in releaseDates) {
+      if (dateInfo is! Map) continue;
+      final type = dateInfo['type'];
+      if (type == 4) { // Digital Release
+        final dateStr = dateInfo['release_date'] as String?;
+        if (dateStr != null && dateStr.isNotEmpty) {
+          final date = DateTime.tryParse(dateStr);
+          if (date != null) {
+            if (earliestDigital == null || date.isBefore(earliestDigital)) {
+              earliestDigital = date;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (earliestDigital != null) {
+    return earliestDigital.toIso8601String();
+  }
+  return null;
+}
+
+Object? _readPhysicalReleaseDate(Map json, String key) {
+  final releases = json['releases'];
+  if (releases == null || releases is! Map) return null;
+  final results = releases['results'];
+  if (results is! List) return null;
+
+  DateTime? earliestPhysical;
+
+  for (final country in results) {
+    if (country is! Map) continue;
+    final releaseDates = country['release_dates'];
+    if (releaseDates is! List) continue;
+
+    for (final dateInfo in releaseDates) {
+      if (dateInfo is! Map) continue;
+      final type = dateInfo['type'];
+      if (type == 5) { // Physical Release
+        final dateStr = dateInfo['release_date'] as String?;
+        if (dateStr != null && dateStr.isNotEmpty) {
+          final date = DateTime.tryParse(dateStr);
+          if (date != null) {
+            if (earliestPhysical == null || date.isBefore(earliestPhysical)) {
+              earliestPhysical = date;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (earliestPhysical != null) {
+    return earliestPhysical.toIso8601String();
+  }
   return null;
 }
 

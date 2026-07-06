@@ -66,6 +66,8 @@ class SeerrRequest extends _$SeerrRequest {
           voteAverage: details.voteAverage,
           contentRating: contentRating,
           releaseDate: details.releaseDate,
+          digitalReleaseDate: details.digitalReleaseDate,
+          physicalReleaseDate: details.physicalReleaseDate,
         );
       }
     }
@@ -321,6 +323,8 @@ abstract class SeerrRequestModel with _$SeerrRequestModel {
     double? voteAverage,
     String? contentRating,
     String? releaseDate,
+    String? digitalReleaseDate,
+    String? physicalReleaseDate,
   }) = _SeerrRequestModel;
 
   bool get isTv => poster?.type == SeerrMediaType.tvshow;

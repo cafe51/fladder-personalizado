@@ -85,8 +85,8 @@ List<Widget> buildClientSettingsDashboard(BuildContext context, WidgetRef ref) {
         ),
       ),
       SettingsListTile(
-        label: const Text("Ocultar Lançamentos Recentes (Seerr)"),
-        subLabel: const Text("Esconde filmes que ainda não saíram do cinema e séries futuras."),
+        label: const Text("Ocultar Mídias Não Lançadas Digitalmente"),
+        subLabel: const Text("Esconde filmes que ainda não estrearam nas plataformas digitais e séries futuras."),
         onTap: () => ref
             .read(clientSettingsProvider.notifier)
             .update((current) => current.copyWith(seerrHideUnreleased: !current.seerrHideUnreleased)),
@@ -99,8 +99,8 @@ List<Widget> buildClientSettingsDashboard(BuildContext context, WidgetRef ref) {
       ),
       if (clientSettings.seerrHideUnreleased)
         SettingsListTile(
-          label: const Text("Dias de Atraso para Filmes"),
-          subLabel: Text("Esconder filmes lançados nos últimos ${clientSettings.seerrDigitalReleaseDelay} dias."),
+          label: const Text("Atraso Estimado (Fallback)"),
+          subLabel: Text("Para listas de descoberta/pesquisa: esconde filmes com menos de ${clientSettings.seerrDigitalReleaseDelay} dias desde a estreia no cinema."),
           trailing: SizedBox(
             width: 150,
             child: Slider(

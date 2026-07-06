@@ -34,6 +34,8 @@ mixin _$SeerrRequestModel {
   double? get voteAverage;
   String? get contentRating;
   String? get releaseDate;
+  String? get digitalReleaseDate;
+  String? get physicalReleaseDate;
 
   /// Create a copy of SeerrRequestModel
   /// with the given fields replaced by the non-null parameter values.
@@ -45,7 +47,7 @@ mixin _$SeerrRequestModel {
 
   @override
   String toString() {
-    return 'SeerrRequestModel(poster: $poster, sonarrServers: $sonarrServers, radarrServers: $radarrServers, selectedSonarrServer: $selectedSonarrServer, selectedRadarrServer: $selectedRadarrServer, selectedProfile: $selectedProfile, selectedRootFolder: $selectedRootFolder, selectedTags: $selectedTags, selectedSeasons: $selectedSeasons, seasonStatuses: $seasonStatuses, userQuotas: $userQuotas, currentUser: $currentUser, selectedUser: $selectedUser, availableUsers: $availableUsers, use4k: $use4k, isAnime: $isAnime, genres: $genres, voteAverage: $voteAverage, contentRating: $contentRating, releaseDate: $releaseDate)';
+    return 'SeerrRequestModel(poster: $poster, sonarrServers: $sonarrServers, radarrServers: $radarrServers, selectedSonarrServer: $selectedSonarrServer, selectedRadarrServer: $selectedRadarrServer, selectedProfile: $selectedProfile, selectedRootFolder: $selectedRootFolder, selectedTags: $selectedTags, selectedSeasons: $selectedSeasons, seasonStatuses: $seasonStatuses, userQuotas: $userQuotas, currentUser: $currentUser, selectedUser: $selectedUser, availableUsers: $availableUsers, use4k: $use4k, isAnime: $isAnime, genres: $genres, voteAverage: $voteAverage, contentRating: $contentRating, releaseDate: $releaseDate, digitalReleaseDate: $digitalReleaseDate, physicalReleaseDate: $physicalReleaseDate)';
   }
 }
 
@@ -75,7 +77,9 @@ abstract mixin class $SeerrRequestModelCopyWith<$Res> {
       List<SeerrGenre> genres,
       double? voteAverage,
       String? contentRating,
-      String? releaseDate});
+      String? releaseDate,
+      String? digitalReleaseDate,
+      String? physicalReleaseDate});
 
   $SeerrSonarrServerCopyWith<$Res>? get selectedSonarrServer;
   $SeerrRadarrServerCopyWith<$Res>? get selectedRadarrServer;
@@ -117,6 +121,8 @@ class _$SeerrRequestModelCopyWithImpl<$Res>
     Object? voteAverage = freezed,
     Object? contentRating = freezed,
     Object? releaseDate = freezed,
+    Object? digitalReleaseDate = freezed,
+    Object? physicalReleaseDate = freezed,
   }) {
     return _then(_self.copyWith(
       poster: freezed == poster
@@ -198,6 +204,14 @@ class _$SeerrRequestModelCopyWithImpl<$Res>
       releaseDate: freezed == releaseDate
           ? _self.releaseDate
           : releaseDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      digitalReleaseDate: freezed == digitalReleaseDate
+          ? _self.digitalReleaseDate
+          : digitalReleaseDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      physicalReleaseDate: freezed == physicalReleaseDate
+          ? _self.physicalReleaseDate
+          : physicalReleaseDate // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -388,7 +402,9 @@ extension SeerrRequestModelPatterns on SeerrRequestModel {
             List<SeerrGenre> genres,
             double? voteAverage,
             String? contentRating,
-            String? releaseDate)?
+            String? releaseDate,
+            String? digitalReleaseDate,
+            String? physicalReleaseDate)?
         $default, {
     required TResult orElse(),
   }) {
@@ -415,7 +431,9 @@ extension SeerrRequestModelPatterns on SeerrRequestModel {
             _that.genres,
             _that.voteAverage,
             _that.contentRating,
-            _that.releaseDate);
+            _that.releaseDate,
+            _that.digitalReleaseDate,
+            _that.physicalReleaseDate);
       case _:
         return orElse();
     }
@@ -456,7 +474,9 @@ extension SeerrRequestModelPatterns on SeerrRequestModel {
             List<SeerrGenre> genres,
             double? voteAverage,
             String? contentRating,
-            String? releaseDate)
+            String? releaseDate,
+            String? digitalReleaseDate,
+            String? physicalReleaseDate)
         $default,
   ) {
     final _that = this;
@@ -482,7 +502,9 @@ extension SeerrRequestModelPatterns on SeerrRequestModel {
             _that.genres,
             _that.voteAverage,
             _that.contentRating,
-            _that.releaseDate);
+            _that.releaseDate,
+            _that.digitalReleaseDate,
+            _that.physicalReleaseDate);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -522,7 +544,9 @@ extension SeerrRequestModelPatterns on SeerrRequestModel {
             List<SeerrGenre> genres,
             double? voteAverage,
             String? contentRating,
-            String? releaseDate)?
+            String? releaseDate,
+            String? digitalReleaseDate,
+            String? physicalReleaseDate)?
         $default,
   ) {
     final _that = this;
@@ -548,7 +572,9 @@ extension SeerrRequestModelPatterns on SeerrRequestModel {
             _that.genres,
             _that.voteAverage,
             _that.contentRating,
-            _that.releaseDate);
+            _that.releaseDate,
+            _that.digitalReleaseDate,
+            _that.physicalReleaseDate);
       case _:
         return null;
     }
@@ -578,7 +604,9 @@ class _SeerrRequestModel extends SeerrRequestModel {
       final List<SeerrGenre> genres = const [],
       this.voteAverage,
       this.contentRating,
-      this.releaseDate})
+      this.releaseDate,
+      this.digitalReleaseDate,
+      this.physicalReleaseDate})
       : _sonarrServers = sonarrServers,
         _radarrServers = radarrServers,
         _selectedTags = selectedTags,
@@ -687,6 +715,10 @@ class _SeerrRequestModel extends SeerrRequestModel {
   final String? contentRating;
   @override
   final String? releaseDate;
+  @override
+  final String? digitalReleaseDate;
+  @override
+  final String? physicalReleaseDate;
 
   /// Create a copy of SeerrRequestModel
   /// with the given fields replaced by the non-null parameter values.
@@ -698,7 +730,7 @@ class _SeerrRequestModel extends SeerrRequestModel {
 
   @override
   String toString() {
-    return 'SeerrRequestModel(poster: $poster, sonarrServers: $sonarrServers, radarrServers: $radarrServers, selectedSonarrServer: $selectedSonarrServer, selectedRadarrServer: $selectedRadarrServer, selectedProfile: $selectedProfile, selectedRootFolder: $selectedRootFolder, selectedTags: $selectedTags, selectedSeasons: $selectedSeasons, seasonStatuses: $seasonStatuses, userQuotas: $userQuotas, currentUser: $currentUser, selectedUser: $selectedUser, availableUsers: $availableUsers, use4k: $use4k, isAnime: $isAnime, genres: $genres, voteAverage: $voteAverage, contentRating: $contentRating, releaseDate: $releaseDate)';
+    return 'SeerrRequestModel(poster: $poster, sonarrServers: $sonarrServers, radarrServers: $radarrServers, selectedSonarrServer: $selectedSonarrServer, selectedRadarrServer: $selectedRadarrServer, selectedProfile: $selectedProfile, selectedRootFolder: $selectedRootFolder, selectedTags: $selectedTags, selectedSeasons: $selectedSeasons, seasonStatuses: $seasonStatuses, userQuotas: $userQuotas, currentUser: $currentUser, selectedUser: $selectedUser, availableUsers: $availableUsers, use4k: $use4k, isAnime: $isAnime, genres: $genres, voteAverage: $voteAverage, contentRating: $contentRating, releaseDate: $releaseDate, digitalReleaseDate: $digitalReleaseDate, physicalReleaseDate: $physicalReleaseDate)';
   }
 }
 
@@ -730,7 +762,9 @@ abstract mixin class _$SeerrRequestModelCopyWith<$Res>
       List<SeerrGenre> genres,
       double? voteAverage,
       String? contentRating,
-      String? releaseDate});
+      String? releaseDate,
+      String? digitalReleaseDate,
+      String? physicalReleaseDate});
 
   @override
   $SeerrSonarrServerCopyWith<$Res>? get selectedSonarrServer;
@@ -777,6 +811,8 @@ class __$SeerrRequestModelCopyWithImpl<$Res>
     Object? voteAverage = freezed,
     Object? contentRating = freezed,
     Object? releaseDate = freezed,
+    Object? digitalReleaseDate = freezed,
+    Object? physicalReleaseDate = freezed,
   }) {
     return _then(_SeerrRequestModel(
       poster: freezed == poster
@@ -858,6 +894,14 @@ class __$SeerrRequestModelCopyWithImpl<$Res>
       releaseDate: freezed == releaseDate
           ? _self.releaseDate
           : releaseDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      digitalReleaseDate: freezed == digitalReleaseDate
+          ? _self.digitalReleaseDate
+          : digitalReleaseDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      physicalReleaseDate: freezed == physicalReleaseDate
+          ? _self.physicalReleaseDate
+          : physicalReleaseDate // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }

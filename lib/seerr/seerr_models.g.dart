@@ -209,6 +209,10 @@ SeerrMovieDetails _$SeerrMovieDetailsFromJson(Map<String, dynamic> json) =>
               as List<dynamic>?)
           ?.map((e) => SeerrContentRating.fromJson(e as Map<String, dynamic>))
           .toList(),
+      digitalReleaseDate:
+          _readDigitalReleaseDate(json, 'digitalReleaseDate') as String?,
+      physicalReleaseDate:
+          _readPhysicalReleaseDate(json, 'physicalReleaseDate') as String?,
     );
 
 Map<String, dynamic> _$SeerrMovieDetailsToJson(SeerrMovieDetails instance) =>
@@ -230,6 +234,8 @@ Map<String, dynamic> _$SeerrMovieDetailsToJson(SeerrMovieDetails instance) =>
       'credits': instance.credits,
       'mediaId': instance.mediaId,
       'contentRatings': instance.contentRatings,
+      'digitalReleaseDate': instance.digitalReleaseDate,
+      'physicalReleaseDate': instance.physicalReleaseDate,
     };
 
 SeerrTvDetails _$SeerrTvDetailsFromJson(Map<String, dynamic> json) =>

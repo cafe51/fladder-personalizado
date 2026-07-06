@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,7 @@ import 'package:fladder/screens/seerr/widgets/seerr_request_popup.dart';
 import 'package:fladder/screens/seerr/widgets/tmdb_images_carousel.dart';
 import 'package:fladder/providers/seerr/seerr_request_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
+import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/screens/seerr/widgets/seerr_requests_sheet.dart';
 import 'package:fladder/screens/shared/fladder_notification_overlay.dart';
 import 'package:fladder/screens/shared/detail_scaffold.dart';
@@ -80,17 +82,37 @@ class SeerrDetailsScreen extends ConsumerWidget {
     final hasUsersRequests = requests.any((request) => request.requestedBy?.id == state.currentUser?.id);
     final hasVisibleRequests = (canManageRequest || hasUsersRequests) && requests.isNotEmpty;
 
-    final canRequestMore = hasKnownStatus
+    final clientSettings = ref.read(clientSettingsProvider);
+    final isMovie = currentPoster?.type == SeerrMediaType.movie;
+
+    bool isReleased = true;
+    if (isMovie && clientSettings.seerrHideUnreleased) {
+      final now = DateTime.now();
+      if (state.digitalReleaseDate != null && state.digitalReleaseDate!.isNotEmpty) {
+        final digitalDate = DateTime.tryParse(state.digitalReleaseDate!);
+        isReleased = digitalDate != null && (digitalDate.isBefore(now) || digitalDate.isAtSameMomentAs(now));
+      } else if (state.releaseDate != null && state.releaseDate!.isNotEmpty) {
+        final theatricalDate = DateTime.tryParse(state.releaseDate!);
+        if (theatricalDate != null) {
+          final limitDate = now.subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
+          isReleased = theatricalDate.isBefore(limitDate) || theatricalDate.isAtSameMomentAs(limitDate);
+        }
+      }
+    }
+
+    final canRequestMore = (hasKnownStatus
         ? switch (currentPoster?.type) {
             SeerrMediaType.movie => false,
             SeerrMediaType.tvshow => true,
             _ => false,
           }
-        : true;
+        : true) && isReleased;
 
-    final mainButtonLabel = currentPoster?.type == SeerrMediaType.movie
-        ? context.localized.request
-        : (canRequestMore ? context.localized.requestMore : context.localized.request);
+    final mainButtonLabel = !isReleased
+        ? "Não Lançado"
+        : (currentPoster?.type == SeerrMediaType.movie
+            ? context.localized.request
+            : (canRequestMore ? context.localized.requestMore : context.localized.request));
 
     final credentials = ref.read(userProvider)?.seerrCredentials;
     final isQuickRequestEnabled = credentials?.enableQuickRequest == true && currentPoster?.type == SeerrMediaType.movie;
@@ -171,6 +193,23 @@ class SeerrDetailsScreen extends ConsumerWidget {
                     officialRating: state.contentRating,
                     communityRating: state.voteAverage,
                     additionalLabels: [
+                      if (currentPoster.type == SeerrMediaType.movie) ...[
+                        if (state.releaseDate != null && state.releaseDate!.isNotEmpty)
+                          SimpleLabel(
+                            icon: IconsaxPlusBold.video_play,
+                            label: Text("Cinema: ${_formatReleaseDate(state.releaseDate, context)}"),
+                          ),
+                        if (state.digitalReleaseDate != null && state.digitalReleaseDate!.isNotEmpty)
+                          SimpleLabel(
+                            icon: IconsaxPlusBold.monitor,
+                            label: Text("Digital: ${_formatReleaseDate(state.digitalReleaseDate, context)}"),
+                          ),
+                        if (state.physicalReleaseDate != null && state.physicalReleaseDate!.isNotEmpty)
+                          SimpleLabel(
+                            icon: IconsaxPlusBold.save_2,
+                            label: Text("Disco: ${_formatReleaseDate(state.physicalReleaseDate, context)}"),
+                          ),
+                      ],
                       if (rottenTomatoes != null)
                         if (rottenTomatoes.criticsScore != null) ...[
                           SimpleLabel(
@@ -712,5 +751,17 @@ class _EpisodeCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+String _formatReleaseDate(String? dateStr, BuildContext context) {
+  if (dateStr == null || dateStr.isEmpty) return '';
+  final date = DateTime.tryParse(dateStr);
+  if (date == null) return '';
+  try {
+    final locale = Localizations.localeOf(context).toString();
+    return DateFormat.yMMMMd(locale).format(date);
+  } catch (_) {
+    return dateStr.split('T')[0];
   }
 }

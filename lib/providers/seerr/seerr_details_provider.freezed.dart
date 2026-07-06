@@ -21,6 +21,8 @@ mixin _$SeerrDetailsModel {
   double? get voteAverage;
   String? get contentRating;
   String? get releaseDate;
+  String? get digitalReleaseDate;
+  String? get physicalReleaseDate;
   List<SeerrDashboardPosterModel> get recommended;
   List<SeerrDashboardPosterModel> get similar;
   List<Person> get people;
@@ -42,7 +44,7 @@ mixin _$SeerrDetailsModel {
 
   @override
   String toString() {
-    return 'SeerrDetailsModel(tmdbId: $tmdbId, mediaType: $mediaType, poster: $poster, genres: $genres, voteAverage: $voteAverage, contentRating: $contentRating, releaseDate: $releaseDate, recommended: $recommended, similar: $similar, people: $people, seasonStatuses: $seasonStatuses, currentUser: $currentUser, expandedSeasons: $expandedSeasons, episodesCache: $episodesCache, relatedVideos: $relatedVideos, externalIds: $externalIds, ratings: $ratings)';
+    return 'SeerrDetailsModel(tmdbId: $tmdbId, mediaType: $mediaType, poster: $poster, genres: $genres, voteAverage: $voteAverage, contentRating: $contentRating, releaseDate: $releaseDate, digitalReleaseDate: $digitalReleaseDate, physicalReleaseDate: $physicalReleaseDate, recommended: $recommended, similar: $similar, people: $people, seasonStatuses: $seasonStatuses, currentUser: $currentUser, expandedSeasons: $expandedSeasons, episodesCache: $episodesCache, relatedVideos: $relatedVideos, externalIds: $externalIds, ratings: $ratings)';
   }
 }
 
@@ -60,6 +62,8 @@ abstract mixin class $SeerrDetailsModelCopyWith<$Res> {
       double? voteAverage,
       String? contentRating,
       String? releaseDate,
+      String? digitalReleaseDate,
+      String? physicalReleaseDate,
       List<SeerrDashboardPosterModel> recommended,
       List<SeerrDashboardPosterModel> similar,
       List<Person> people,
@@ -94,6 +98,8 @@ class _$SeerrDetailsModelCopyWithImpl<$Res>
     Object? voteAverage = freezed,
     Object? contentRating = freezed,
     Object? releaseDate = freezed,
+    Object? digitalReleaseDate = freezed,
+    Object? physicalReleaseDate = freezed,
     Object? recommended = null,
     Object? similar = null,
     Object? people = null,
@@ -133,6 +139,14 @@ class _$SeerrDetailsModelCopyWithImpl<$Res>
       releaseDate: freezed == releaseDate
           ? _self.releaseDate
           : releaseDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      digitalReleaseDate: freezed == digitalReleaseDate
+          ? _self.digitalReleaseDate
+          : digitalReleaseDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      physicalReleaseDate: freezed == physicalReleaseDate
+          ? _self.physicalReleaseDate
+          : physicalReleaseDate // ignore: cast_nullable_to_non_nullable
               as String?,
       recommended: null == recommended
           ? _self.recommended
@@ -293,6 +307,8 @@ extension SeerrDetailsModelPatterns on SeerrDetailsModel {
             double? voteAverage,
             String? contentRating,
             String? releaseDate,
+            String? digitalReleaseDate,
+            String? physicalReleaseDate,
             List<SeerrDashboardPosterModel> recommended,
             List<SeerrDashboardPosterModel> similar,
             List<Person> people,
@@ -317,6 +333,8 @@ extension SeerrDetailsModelPatterns on SeerrDetailsModel {
             _that.voteAverage,
             _that.contentRating,
             _that.releaseDate,
+            _that.digitalReleaseDate,
+            _that.physicalReleaseDate,
             _that.recommended,
             _that.similar,
             _that.people,
@@ -355,6 +373,8 @@ extension SeerrDetailsModelPatterns on SeerrDetailsModel {
             double? voteAverage,
             String? contentRating,
             String? releaseDate,
+            String? digitalReleaseDate,
+            String? physicalReleaseDate,
             List<SeerrDashboardPosterModel> recommended,
             List<SeerrDashboardPosterModel> similar,
             List<Person> people,
@@ -378,6 +398,8 @@ extension SeerrDetailsModelPatterns on SeerrDetailsModel {
             _that.voteAverage,
             _that.contentRating,
             _that.releaseDate,
+            _that.digitalReleaseDate,
+            _that.physicalReleaseDate,
             _that.recommended,
             _that.similar,
             _that.people,
@@ -415,6 +437,8 @@ extension SeerrDetailsModelPatterns on SeerrDetailsModel {
             double? voteAverage,
             String? contentRating,
             String? releaseDate,
+            String? digitalReleaseDate,
+            String? physicalReleaseDate,
             List<SeerrDashboardPosterModel> recommended,
             List<SeerrDashboardPosterModel> similar,
             List<Person> people,
@@ -438,6 +462,8 @@ extension SeerrDetailsModelPatterns on SeerrDetailsModel {
             _that.voteAverage,
             _that.contentRating,
             _that.releaseDate,
+            _that.digitalReleaseDate,
+            _that.physicalReleaseDate,
             _that.recommended,
             _that.similar,
             _that.people,
@@ -465,6 +491,8 @@ class _SeerrDetailsModel extends SeerrDetailsModel {
       this.voteAverage,
       this.contentRating,
       this.releaseDate,
+      this.digitalReleaseDate,
+      this.physicalReleaseDate,
       final List<SeerrDashboardPosterModel> recommended = const [],
       final List<SeerrDashboardPosterModel> similar = const [],
       final List<Person> people = const [],
@@ -506,6 +534,10 @@ class _SeerrDetailsModel extends SeerrDetailsModel {
   final String? contentRating;
   @override
   final String? releaseDate;
+  @override
+  final String? digitalReleaseDate;
+  @override
+  final String? physicalReleaseDate;
   final List<SeerrDashboardPosterModel> _recommended;
   @override
   @JsonKey()
@@ -586,7 +618,7 @@ class _SeerrDetailsModel extends SeerrDetailsModel {
 
   @override
   String toString() {
-    return 'SeerrDetailsModel(tmdbId: $tmdbId, mediaType: $mediaType, poster: $poster, genres: $genres, voteAverage: $voteAverage, contentRating: $contentRating, releaseDate: $releaseDate, recommended: $recommended, similar: $similar, people: $people, seasonStatuses: $seasonStatuses, currentUser: $currentUser, expandedSeasons: $expandedSeasons, episodesCache: $episodesCache, relatedVideos: $relatedVideos, externalIds: $externalIds, ratings: $ratings)';
+    return 'SeerrDetailsModel(tmdbId: $tmdbId, mediaType: $mediaType, poster: $poster, genres: $genres, voteAverage: $voteAverage, contentRating: $contentRating, releaseDate: $releaseDate, digitalReleaseDate: $digitalReleaseDate, physicalReleaseDate: $physicalReleaseDate, recommended: $recommended, similar: $similar, people: $people, seasonStatuses: $seasonStatuses, currentUser: $currentUser, expandedSeasons: $expandedSeasons, episodesCache: $episodesCache, relatedVideos: $relatedVideos, externalIds: $externalIds, ratings: $ratings)';
   }
 }
 
@@ -606,6 +638,8 @@ abstract mixin class _$SeerrDetailsModelCopyWith<$Res>
       double? voteAverage,
       String? contentRating,
       String? releaseDate,
+      String? digitalReleaseDate,
+      String? physicalReleaseDate,
       List<SeerrDashboardPosterModel> recommended,
       List<SeerrDashboardPosterModel> similar,
       List<Person> people,
@@ -641,6 +675,8 @@ class __$SeerrDetailsModelCopyWithImpl<$Res>
     Object? voteAverage = freezed,
     Object? contentRating = freezed,
     Object? releaseDate = freezed,
+    Object? digitalReleaseDate = freezed,
+    Object? physicalReleaseDate = freezed,
     Object? recommended = null,
     Object? similar = null,
     Object? people = null,
@@ -680,6 +716,14 @@ class __$SeerrDetailsModelCopyWithImpl<$Res>
       releaseDate: freezed == releaseDate
           ? _self.releaseDate
           : releaseDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      digitalReleaseDate: freezed == digitalReleaseDate
+          ? _self.digitalReleaseDate
+          : digitalReleaseDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      physicalReleaseDate: freezed == physicalReleaseDate
+          ? _self.physicalReleaseDate
+          : physicalReleaseDate // ignore: cast_nullable_to_non_nullable
               as String?,
       recommended: null == recommended
           ? _self._recommended
