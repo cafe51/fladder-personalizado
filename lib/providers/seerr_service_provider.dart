@@ -551,89 +551,73 @@ class SeerrService {
   }
 
   Future<List<SeerrDashboardPosterModel>> discoverPopularMovies({int? page, String? language}) async {
-    final clientSettings = ref.read(clientSettingsProvider);
-    String? primaryReleaseDateLte;
-    if (clientSettings.seerrHideUnreleased) {
-      final limitDate = DateTime.now().subtract(Duration(days: clientSettings.seerrDigitalReleaseDelay));
-      primaryReleaseDateLte = "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}";
-    }
-
     final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
+    var results = <SeerrDiscoverItem>[];
 
     if (page == null) {
       final response1 = await _api.getDiscoverMovies(
         page: 1,
         language: language,
         sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
-        primaryReleaseDateLte: primaryReleaseDateLte,
         genre: isKidsMode ? '16,10751' : null,
       );
       final response2 = await _api.getDiscoverMovies(
         page: 2,
         language: language,
         sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
-        primaryReleaseDateLte: primaryReleaseDateLte,
         genre: isKidsMode ? '16,10751' : null,
       );
-      final results = [
+      results = [
         ...(response1.body?.results ?? const <SeerrDiscoverItem>[]),
         ...(response2.body?.results ?? const <SeerrDiscoverItem>[]),
       ];
-      return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
     } else {
       final response = await _api.getDiscoverMovies(
         page: page,
         language: language,
         sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
-        primaryReleaseDateLte: primaryReleaseDateLte,
         genre: isKidsMode ? '16,10751' : null,
       );
-      final results = response.body?.results ?? const <SeerrDiscoverItem>[];
-      return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+      results = response.body?.results ?? const <SeerrDiscoverItem>[];
     }
+
+    results = _filterUnreleased(results);
+    return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
   }
 
   Future<List<SeerrDashboardPosterModel>> discoverPopularSeries({int? page, String? language}) async {
-    final clientSettings = ref.read(clientSettingsProvider);
-    String? firstAirDateLte;
-    if (clientSettings.seerrHideUnreleased) {
-      final limitDate = DateTime.now();
-      firstAirDateLte = "${limitDate.year}-${limitDate.month.toString().padLeft(2, '0')}-${limitDate.day.toString().padLeft(2, '0')}";
-    }
-
     final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
+    var results = <SeerrDiscoverItem>[];
 
     if (page == null) {
       final response1 = await _api.getDiscoverTv(
         page: 1,
         language: language,
         sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
-        firstAirDateLte: firstAirDateLte,
         genre: isKidsMode ? '16,10751,10762' : null,
       );
       final response2 = await _api.getDiscoverTv(
         page: 2,
         language: language,
         sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
-        firstAirDateLte: firstAirDateLte,
         genre: isKidsMode ? '16,10751,10762' : null,
       );
-      final results = [
+      results = [
         ...(response1.body?.results ?? const <SeerrDiscoverItem>[]),
         ...(response2.body?.results ?? const <SeerrDiscoverItem>[]),
       ];
-      return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
     } else {
       final response = await _api.getDiscoverTv(
         page: page,
         language: language,
         sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
-        firstAirDateLte: firstAirDateLte,
         genre: isKidsMode ? '16,10751,10762' : null,
       );
-      final results = response.body?.results ?? const <SeerrDiscoverItem>[];
-      return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+      results = response.body?.results ?? const <SeerrDiscoverItem>[];
     }
+
+    results = _filterUnreleased(results);
+    return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
   }
 
   Future<List<SeerrDashboardPosterModel>> discoverExpectedMovies({int? page, String? language}) async {
