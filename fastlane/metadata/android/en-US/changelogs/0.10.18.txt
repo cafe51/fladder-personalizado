@@ -1,0 +1,3 @@
+- Fixed Kids Mode filtering to properly restrict TMDB API results for the newly added Streaming Provider Carousels.
+- Implemented 100% reliable tracking via Blackhole using TMDB ID sidecar texts.
+- Improved fallback tracking algorithms to be more resilient with years and punctuation.
