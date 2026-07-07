@@ -59,6 +59,7 @@ SeerrUserSettings _$SeerrUserSettingsFromJson(Map<String, dynamic> json) =>
     SeerrUserSettings(
       locale: json['locale'] as String?,
       discoverRegion: json['discoverRegion'] as String?,
+      streamingRegion: json['streamingRegion'] as String?,
       originalLanguage: json['originalLanguage'] as String?,
     );
 
@@ -66,6 +67,7 @@ Map<String, dynamic> _$SeerrUserSettingsToJson(SeerrUserSettings instance) =>
     <String, dynamic>{
       'locale': instance.locale,
       'discoverRegion': instance.discoverRegion,
+      'streamingRegion': instance.streamingRegion,
       'originalLanguage': instance.originalLanguage,
     };
 

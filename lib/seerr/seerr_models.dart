@@ -298,11 +298,13 @@ extension SeerrUserPermissions on SeerrUserModel {
 class SeerrUserSettings {
   final String? locale;
   final String? discoverRegion;
+  final String? streamingRegion;
   final String? originalLanguage;
 
   SeerrUserSettings({
     this.locale,
     this.discoverRegion,
+    this.streamingRegion,
     this.originalLanguage,
   });
 

@@ -51,6 +51,11 @@
         }
     },
     "about": "Sobre",
+    "popularOnDisneyPlus": "Populares no Disney+",
+    "popularOnPrimeVideo": "Populares no Prime Video",
+    "popularOnAppleTv": "Populares no Apple TV+",
+    "popularOnParamount": "Populares no Paramount+",
+    "popularOnHboMax": "Populares no HBO Max",
     "accept": "Aceitar",
     "addAsFavorite": "Adicionar como favorito",
     "addToCollection": "Adicionar à coleção",

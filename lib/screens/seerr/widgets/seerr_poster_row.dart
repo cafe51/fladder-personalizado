@@ -13,6 +13,7 @@ import 'package:fladder/widgets/shared/horizontal_list.dart';
 class SeerrPosterRow extends ConsumerWidget {
   final List<SeerrDashboardPosterModel> posters;
   final String label;
+  final String? logoUrl;
   final EdgeInsets contentPadding;
   final void Function(SeerrDashboardPosterModel focused)? onFocused;
 
@@ -21,6 +22,7 @@ class SeerrPosterRow extends ConsumerWidget {
   const SeerrPosterRow({
     required this.posters,
     required this.label,
+    this.logoUrl,
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 16),
     this.onFocused,
     this.onLabelClick,
@@ -34,6 +36,12 @@ class SeerrPosterRow extends ConsumerWidget {
     return HorizontalList<SeerrDashboardPosterModel>(
       contentPadding: contentPadding,
       label: label,
+      titleLeading: logoUrl != null 
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.network(logoUrl!, width: 24, height: 24, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const SizedBox()),
+            )
+          : null,
       autoFocus: ref.read(argumentsStateProvider).htpcMode ? FocusProvider.autoFocusOf(context) : false,
       onLabelClick: onLabelClick,
       dominantRatio: dominantRatio,

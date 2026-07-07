@@ -263,6 +263,11 @@ class SeerrDashboardModel {
   final List<SeerrDashboardPosterModel> popularSeries;
   final List<SeerrDashboardPosterModel> expectedMovies;
   final List<SeerrDashboardPosterModel> expectedSeries;
+  final List<SeerrDashboardPosterModel> disneyPlus;
+  final List<SeerrDashboardPosterModel> primeVideo;
+  final List<SeerrDashboardPosterModel> appleTv;
+  final List<SeerrDashboardPosterModel> paramount;
+  final List<SeerrDashboardPosterModel> hboMax;
 
   const SeerrDashboardModel({
     this.recentlyAdded = const [],
@@ -272,6 +277,11 @@ class SeerrDashboardModel {
     this.popularSeries = const [],
     this.expectedMovies = const [],
     this.expectedSeries = const [],
+    this.disneyPlus = const [],
+    this.primeVideo = const [],
+    this.appleTv = const [],
+    this.paramount = const [],
+    this.hboMax = const [],
   });
 
   SeerrDashboardModel copyWith({
@@ -282,6 +292,11 @@ class SeerrDashboardModel {
     List<SeerrDashboardPosterModel>? popularSeries,
     List<SeerrDashboardPosterModel>? expectedMovies,
     List<SeerrDashboardPosterModel>? expectedSeries,
+    List<SeerrDashboardPosterModel>? disneyPlus,
+    List<SeerrDashboardPosterModel>? primeVideo,
+    List<SeerrDashboardPosterModel>? appleTv,
+    List<SeerrDashboardPosterModel>? paramount,
+    List<SeerrDashboardPosterModel>? hboMax,
   }) {
     return SeerrDashboardModel(
       recentlyAdded: recentlyAdded ?? this.recentlyAdded,
@@ -291,6 +306,11 @@ class SeerrDashboardModel {
       popularSeries: popularSeries ?? this.popularSeries,
       expectedMovies: expectedMovies ?? this.expectedMovies,
       expectedSeries: expectedSeries ?? this.expectedSeries,
+      disneyPlus: disneyPlus ?? this.disneyPlus,
+      primeVideo: primeVideo ?? this.primeVideo,
+      appleTv: appleTv ?? this.appleTv,
+      paramount: paramount ?? this.paramount,
+      hboMax: hboMax ?? this.hboMax,
     );
   }
 }

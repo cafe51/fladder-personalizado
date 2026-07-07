@@ -6,6 +6,23 @@ part of 'seerr_dashboard_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$seerrProviderLogosHash() => r'dummy_hash_for_logos';
+
+/// See also [seerrProviderLogos].
+@ProviderFor(seerrProviderLogos)
+final seerrProviderLogosProvider =
+    AutoDisposeFutureProvider<Map<int, String>>.internal(
+  seerrProviderLogos,
+  name: r'seerrProviderLogosProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$seerrProviderLogosHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef SeerrProviderLogosRef = AutoDisposeFutureProviderRef<Map<int, String>>;
+
 String _$seerrDashboardHash() => r'965f26eb5942a64b9162961427c0b08f3b0ce5c3';
 
 /// See also [SeerrDashboard].

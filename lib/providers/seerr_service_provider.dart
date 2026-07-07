@@ -554,70 +554,161 @@ class SeerrService {
     final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
     var results = <SeerrDiscoverItem>[];
 
-    if (page == null) {
-      final response1 = await _api.getDiscoverMovies(
-        page: 1,
-        language: language,
-        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
-        genre: isKidsMode ? '16,10751' : null,
-      );
-      final response2 = await _api.getDiscoverMovies(
-        page: 2,
-        language: language,
-        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
-        genre: isKidsMode ? '16,10751' : null,
-      );
-      results = [
-        ...(response1.body?.results ?? const <SeerrDiscoverItem>[]),
-        ...(response2.body?.results ?? const <SeerrDiscoverItem>[]),
-      ];
+    if (isKidsMode) {
+      if (page == null) {
+        final response1 = await _api.getDiscoverMovies(
+          page: 1,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+          genre: '16,10751',
+        );
+        final response2 = await _api.getDiscoverMovies(
+          page: 2,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+          genre: '16,10751',
+        );
+        results = [
+          ...(response1.body?.results ?? const <SeerrDiscoverItem>[]),
+          ...(response2.body?.results ?? const <SeerrDiscoverItem>[]),
+        ];
+      } else {
+        final response = await _api.getDiscoverMovies(
+          page: page,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+          genre: '16,10751',
+        );
+        results = response.body?.results ?? const <SeerrDiscoverItem>[];
+      }
     } else {
-      final response = await _api.getDiscoverMovies(
-        page: page,
-        language: language,
-        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
-        genre: isKidsMode ? '16,10751' : null,
-      );
-      results = response.body?.results ?? const <SeerrDiscoverItem>[];
+      if (page == null) {
+        final futures = <Future<Response<SeerrDiscoverResponse>>>[];
+        for (int i = 1; i <= 20; i++) {
+          futures.add(_api.getDiscoverTrending(page: i, language: language));
+        }
+        final responses = await Future.wait(futures);
+        for (final response in responses) {
+          results.addAll(response.body?.results ?? const <SeerrDiscoverItem>[]);
+        }
+      } else {
+        final response = await _api.getDiscoverTrending(page: page, language: language);
+        results = response.body?.results ?? const <SeerrDiscoverItem>[];
+      }
+      results = results.where((item) => _resolveMediaType(item) == SeerrMediaType.movie).toList();
     }
 
+    final uniqueIds = <int>{};
+    results.retainWhere((item) => item.id != null && uniqueIds.add(item.id!));
+
     results = _filterUnreleased(results);
-    return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().take(60).toList(growable: false);
   }
 
   Future<List<SeerrDashboardPosterModel>> discoverPopularSeries({int? page, String? language}) async {
     final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
     var results = <SeerrDiscoverItem>[];
 
-    if (page == null) {
-      final response1 = await _api.getDiscoverTv(
-        page: 1,
-        language: language,
-        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
-        genre: isKidsMode ? '16,10751,10762' : null,
-      );
-      final response2 = await _api.getDiscoverTv(
-        page: 2,
-        language: language,
-        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
-        genre: isKidsMode ? '16,10751,10762' : null,
-      );
-      results = [
-        ...(response1.body?.results ?? const <SeerrDiscoverItem>[]),
-        ...(response2.body?.results ?? const <SeerrDiscoverItem>[]),
-      ];
+    if (isKidsMode) {
+      if (page == null) {
+        final response1 = await _api.getDiscoverTv(
+          page: 1,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+          genre: '16,10751,10762',
+        );
+        final response2 = await _api.getDiscoverTv(
+          page: 2,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+          genre: '16,10751,10762',
+        );
+        results = [
+          ...(response1.body?.results ?? const <SeerrDiscoverItem>[]),
+          ...(response2.body?.results ?? const <SeerrDiscoverItem>[]),
+        ];
+      } else {
+        final response = await _api.getDiscoverTv(
+          page: page,
+          language: language,
+          sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+          genre: '16,10751,10762',
+        );
+        results = response.body?.results ?? const <SeerrDiscoverItem>[];
+      }
     } else {
-      final response = await _api.getDiscoverTv(
-        page: page,
-        language: language,
-        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
-        genre: isKidsMode ? '16,10751,10762' : null,
-      );
-      results = response.body?.results ?? const <SeerrDiscoverItem>[];
+      if (page == null) {
+        final futures = <Future<Response<SeerrDiscoverResponse>>>[];
+        for (int i = 1; i <= 10; i++) {
+          futures.add(_api.getDiscoverTrending(page: i, language: language));
+        }
+        final responses = await Future.wait(futures);
+        for (final response in responses) {
+          results.addAll(response.body?.results ?? const <SeerrDiscoverItem>[]);
+        }
+      } else {
+        final response = await _api.getDiscoverTrending(page: page, language: language);
+        results = response.body?.results ?? const <SeerrDiscoverItem>[];
+      }
+      results = results.where((item) => _resolveMediaType(item) == SeerrMediaType.tvshow).toList();
     }
 
+    final uniqueIds = <int>{};
+    results.retainWhere((item) => item.id != null && uniqueIds.add(item.id!));
+
     results = _filterUnreleased(results);
-    return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    return results.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().take(60).toList(growable: false);
+  }
+
+  Future<({List<SeerrDashboardPosterModel> movies, List<SeerrDashboardPosterModel> series})> discoverProviderMedia({
+    required String watchProviders,
+    required String watchRegion,
+    String? language,
+  }) async {
+    final movieFutures = <Future<Response<SeerrDiscoverResponse>>>[];
+    final tvFutures = <Future<Response<SeerrDiscoverResponse>>>[];
+    
+    final threeYearsAgo = DateTime.now().subtract(const Duration(days: 3 * 365));
+    final dateString = threeYearsAgo.toIso8601String().split('T')[0];
+    
+    for (int i = 1; i <= 4; i++) {
+      movieFutures.add(_api.getDiscoverMovies(
+        page: i,
+        language: language,
+        watchProviders: watchProviders,
+        watchRegion: watchRegion,
+        primaryReleaseDateGte: dateString,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
+      ));
+      
+      tvFutures.add(_api.getDiscoverTv(
+        page: i,
+        language: language,
+        watchProviders: watchProviders,
+        watchRegion: watchRegion,
+        firstAirDateGte: dateString,
+        sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
+      ));
+    }
+    
+    final movieResponses = await Future.wait(movieFutures);
+    final tvResponses = await Future.wait(tvFutures);
+    
+    var moviesRaw = <SeerrDiscoverItem>[];
+    for (final response in movieResponses) {
+      moviesRaw.addAll(response.body?.results ?? const <SeerrDiscoverItem>[]);
+    }
+    moviesRaw = _filterUnreleased(moviesRaw);
+    final movies = moviesRaw.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    
+    var tvsRaw = <SeerrDiscoverItem>[];
+    for (final response in tvResponses) {
+      tvsRaw.addAll(response.body?.results ?? const <SeerrDiscoverItem>[]);
+    }
+    tvsRaw = _filterUnreleased(tvsRaw);
+    final series = tvsRaw.map(_posterFromDiscoverItem).whereType<SeerrDashboardPosterModel>().toList(growable: false);
+    
+    return (movies: movies, series: series);
   }
 
   Future<List<SeerrDashboardPosterModel>> discoverExpectedMovies({int? page, String? language}) async {

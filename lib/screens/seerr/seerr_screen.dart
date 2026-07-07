@@ -46,11 +46,11 @@ class _SeerrScreenState extends ConsumerState<SeerrScreen> {
   Widget build(BuildContext context) {
     final padding = AdaptiveLayout.adaptivePadding(context);
     final dashboardState = ref.watch(seerrDashboardProvider);
+    final providerLogos = ref.watch(seerrProviderLogosProvider).valueOrNull ?? const <int, String>{};
     final canViewRecent = ref.watch(seerrUserProvider.select((state) => state?.canViewRecent ?? false));
     final backgroundImages = [
       ...dashboardState.recentlyAdded,
       ...dashboardState.recentRequests,
-      ...dashboardState.trending,
       ...dashboardState.popularMovies,
       ...dashboardState.popularSeries,
       ...dashboardState.expectedMovies,
@@ -90,15 +90,6 @@ class _SeerrScreenState extends ConsumerState<SeerrScreen> {
                     onRequestAddTap: (poster) => openRequest(context, poster),
                   ),
                 ),
-              if (dashboardState.trending.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: SeerrPosterRow(
-                    label: context.localized.trending,
-                    posters: dashboardState.trending,
-                    contentPadding: padding,
-                    onLabelClick: () => context.pushRoute(SeerrSearchRoute(mode: SeerrSearchMode.trending)),
-                  ),
-                ),
               if (dashboardState.popularMovies.isNotEmpty)
                 SliverToBoxAdapter(
                   child: SeerrPosterRow(
@@ -115,6 +106,51 @@ class _SeerrScreenState extends ConsumerState<SeerrScreen> {
                     posters: dashboardState.popularSeries,
                     contentPadding: padding,
                     onLabelClick: () => context.pushRoute(SeerrSearchRoute(mode: SeerrSearchMode.discoverTv)),
+                  ),
+                ),
+              if (dashboardState.disneyPlus.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: SeerrPosterRow(
+                    label: 'Disney+',
+                    logoUrl: providerLogos[337],
+                    posters: dashboardState.disneyPlus,
+                    contentPadding: padding,
+                  ),
+                ),
+              if (dashboardState.primeVideo.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: SeerrPosterRow(
+                    label: 'Prime Video',
+                    logoUrl: providerLogos[9],
+                    posters: dashboardState.primeVideo,
+                    contentPadding: padding,
+                  ),
+                ),
+              if (dashboardState.appleTv.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: SeerrPosterRow(
+                    label: 'Apple TV+',
+                    logoUrl: providerLogos[350],
+                    posters: dashboardState.appleTv,
+                    contentPadding: padding,
+                  ),
+                ),
+              if (dashboardState.paramount.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: SeerrPosterRow(
+                    label: 'Paramount+',
+                    logoUrl: providerLogos[2303],
+                    posters: dashboardState.paramount,
+                    contentPadding: padding,
+                  ),
+                ),
+              if (dashboardState.hboMax.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: SeerrPosterRow(
+                    label: 'HBO Max',
+                    logoUrl: providerLogos[1899],
+                    posters: dashboardState.hboMax,
+                    contentPadding: padding,
                   ),
                 ),
               if (dashboardState.expectedMovies.isNotEmpty)

@@ -28,6 +28,18 @@ class DownloadStatusLabel extends ConsumerWidget {
         ? allDownloads.where((d) => filterSeasons!.contains(d.episode?.seasonNumber)).toList()
         : allDownloads;
 
+    try {
+        if (poster.title.toLowerCase().contains("gladi") || poster.title.toLowerCase().contains("glad")) {
+            final debugStr = "Gladiador Debug:\n" +
+              "mediaStatus: ${poster.mediaStatus}\n" +
+              "relevantDownloads length: ${relevantDownloads.length}\n" +
+              "downloads: ${relevantDownloads.map((d) => 'id: ${d.downloadId}, size: ${d.size}, title: ${d.title}').join(' | ')}\n";
+            
+            // ignore: avoid_print
+            print("FLADDER_DEBUG: $debugStr");
+        }
+    } catch (_) {}
+
     num totalSize = 0;
     num totalRemaining = 0;
 
@@ -53,32 +65,146 @@ class DownloadStatusLabel extends ConsumerWidget {
       final transmissionTorrents = ref.watch(transmissionProvider);
       Map<String, dynamic>? activeTorrent;
       
+      bool isMatch(Map<String, dynamic> t, String? downloadTitle) {
+          final tName = normalizeTitle(t['name']);
+          final dTitle = normalizeTitle(downloadTitle);
+          final pTitle = normalizeTitle(poster.title);
+
+          if (dTitle.isNotEmpty && tName.contains(dTitle)) return true;
+          if (pTitle.isNotEmpty && tName.contains(pTitle)) return true;
+
+          // Smart fallback: Year + Prefix match
+          final year = poster.releaseYear;
+          if (year != null && year.isNotEmpty && tName.contains(year)) {
+              final prefixLen = pTitle.length > 4 ? 4 : pTitle.length;
+              if (prefixLen >= 3 && tName.contains(pTitle.substring(0, prefixLen))) {
+                  return true;
+              }
+          }
+          return false;
+      }
+
+      // Match B: 100% TMDB/TVDB ID Matching via sidecar text files (User's Strategy)
+      bool isMatchByIds(Map<String, dynamic> t) {
+          final tmdbId = poster.tmdbId.toString(); // tmdbId is never null since it's int
+          final tvdbId = poster.mediaInfo?.tvdbId?.toString();
+          
+          final apiTmdbId = t['tmdbId']?.toString();
+          final apiTvdbId = t['tvdbId']?.toString();
+          
+          if (apiTmdbId != null && apiTmdbId == tmdbId) return true;
+          if (apiTvdbId != null && tvdbId != null && apiTvdbId == tvdbId) return true;
+          
+          // Fallback if Radarr wrote it to the torrent name manually (which it usually doesn't, but just in case)
+          final tName = t['name']?.toString() ?? '';
+          final dDir = t['downloadDir']?.toString() ?? '';
+          if (tName.contains('id=$tmdbId') || tName.contains('tmdb-$tmdbId') || tName.contains('tmdbid=$tmdbId') || tName.contains('[$tmdbId]')) return true;
+          if (dDir.contains('id=$tmdbId') || dDir.contains('tmdb-$tmdbId') || dDir.contains('tmdbid=$tmdbId') || dDir.contains('[$tmdbId]')) return true;
+          return false;
+      }
+
+      // Match C: Title Fallback (Aprimorado)
+      bool isMatchByTitle(Map<String, dynamic> t) {
+          final tNameRaw = t['name']?.toString().toLowerCase() ?? '';
+          
+          // Limpa pontuações tanto do nome do torrent quanto do título do pôster
+          final tNameClean = tNameRaw.replaceAll(RegExp(r'[^a-z0-9]'), ' ');
+          final pTitleClean = poster.title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), ' ');
+          
+          // Separa as palavras do título do Jellyseerr
+          final words = pTitleClean.split(' ').where((w) => w.isNotEmpty).toList();
+          if (words.isEmpty) return false;
+          
+          // Exige que TODAS as palavras do título estejam no nome do torrent
+          bool allWordsMatch = true;
+          for (final word in words) {
+              if (!tNameClean.contains(word)) {
+                  allWordsMatch = false;
+                  break;
+              }
+          }
+          
+          if (!allWordsMatch) return false;
+          
+          // Se as palavras bateram, vamos checar o ano (se for filme)
+          if (poster.type == SeerrMediaType.movie) {
+              final releaseYear = poster.releaseYear;
+              if (releaseYear != null && releaseYear.isNotEmpty && int.tryParse(releaseYear) != null) {
+                  final yearInt = int.parse(releaseYear);
+                  // Verifica o ano exato, o ano anterior ou o ano seguinte (tolerância comum de releases)
+                  final hasYear = tNameClean.contains(yearInt.toString()) || 
+                                  tNameClean.contains((yearInt - 1).toString()) || 
+                                  tNameClean.contains((yearInt + 1).toString());
+                  
+                  // Se tem o ano na string do torrent, perfeito. 
+                  // Se não tem nenhum ano na string do torrent, deixamos passar (alguns torrents não tem ano).
+                  // Mas se tiver um ano totalmente diferente, a gente confia no match se o título for longo.
+                  if (!hasYear && words.length < 3) {
+                      // Títulos curtos sem o ano batendo são perigosos.
+                      return false;
+                  }
+              }
+          }
+          
+          return true;
+      }
+
       for (final download in relevantDownloads) {
-          if (download.downloadId != null && download.downloadId!.isNotEmpty) {
-              for (final t in transmissionTorrents) {
-                  if (t['hashString']?.toString().toLowerCase() == download.downloadId?.toLowerCase()) {
+          // Match A: By Size or Hash Substring (Bulletproof integration with Radarr/Jellyseerr)
+          for (final t in transmissionTorrents) {
+              final tSize = t['totalSize'] as num?;
+              if (tSize != null && tSize > 0 && download.size != null && download.size == tSize) {
+                  activeTorrent = t as Map<String, dynamic>?;
+                  break;
+              }
+              
+              final hash = t['hashString']?.toString().toLowerCase();
+              final dId = download.downloadId?.toLowerCase();
+              if (hash != null && hash.isNotEmpty && dId != null && dId.isNotEmpty) {
+                  if (dId.contains(hash) || hash.contains(dId)) {
                       activeTorrent = t as Map<String, dynamic>?;
                       break;
                   }
               }
           }
-          if (activeTorrent == null && download.title != null) {
+          
+          // Match B: TMDB/TVDB ID Exact Match
+          if (activeTorrent == null) {
               for (final t in transmissionTorrents) {
-                  if (normalizeTitle(t['name']) == normalizeTitle(download.title)) {
+                  if (isMatchByIds(t)) {
                       activeTorrent = t as Map<String, dynamic>?;
                       break;
                   }
               }
           }
+          
+          // Match C: Title Fallback (only if TMDB match failed)
+          if (activeTorrent == null) {
+              for (final t in transmissionTorrents) {
+                  if (isMatchByTitle(t)) {
+                      activeTorrent = t as Map<String, dynamic>?;
+                      break;
+                  }
+              }
+          }
+          
           if (activeTorrent != null) break;
       }
 
-      // Seerr às vezes não tem o download ainda, mas está em processando. Tentar bater pelo título original em PT se o torrent tiver o mesmo nome (raro, mas fallback)
+      // Seerr às vezes não tem o download ainda, mas está em processando.
       if (activeTorrent == null && poster.mediaStatus == SeerrMediaStatus.processing) {
           for (final t in transmissionTorrents) {
-              if (normalizeTitle(t['name']).contains(normalizeTitle(poster.title))) {
+              if (isMatchByIds(t)) {
                   activeTorrent = t as Map<String, dynamic>?;
                   break;
+              }
+          }
+          if (activeTorrent == null) {
+              for (final t in transmissionTorrents) {
+                  if (isMatchByTitle(t)) {
+                      activeTorrent = t as Map<String, dynamic>?;
+                      break;
+                  }
               }
           }
       }

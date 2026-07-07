@@ -9,7 +9,25 @@ import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/seerr/seerr_models.dart';
 
+import 'package:fladder/seerr/seerr_models.dart';
+
 part 'seerr_dashboard_provider.g.dart';
+
+@riverpod
+Future<Map<int, String>> seerrProviderLogos(SeerrProviderLogosRef ref) async {
+  final api = ref.watch(seerrApiProvider);
+  final userSettings = ref.watch(seerrUserProvider)?.settings;
+  final watchRegion = userSettings?.streamingRegion ?? userSettings?.discoverRegion ?? 'US';
+  final res = await api.getMovieWatchProviders(watchRegion: watchRegion);
+  final map = <int, String>{};
+  final providers = res.body ?? const <SeerrWatchProvider>[];
+  for (final p in providers) {
+    if (p.providerId != null && p.logoUrl != null) {
+      map[p.providerId!] = p.logoUrl!;
+    }
+  }
+  return map;
+}
 
 @riverpod
 class SeerrDashboard extends _$SeerrDashboard {
@@ -23,6 +41,9 @@ class SeerrDashboard extends _$SeerrDashboard {
   Future<void> fetchDashboard() async {
     await ref.read(seerrUserProvider.notifier).refreshUser();
     final clientSettings = ref.read(clientSettingsProvider);
+    final userSettings = ref.read(seerrUserProvider)?.settings;
+    final watchRegion = userSettings?.streamingRegion ?? userSettings?.discoverRegion ?? 'US';
+
     await Future.wait([
       fetchRecentlyAdded(),
       fetchRecentRequests(),
@@ -31,6 +52,7 @@ class SeerrDashboard extends _$SeerrDashboard {
       fetchPopularSeries(),
       if (!clientSettings.seerrHideUnreleased) fetchExpectedMovies(),
       if (!clientSettings.seerrHideUnreleased) fetchExpectedSeries(),
+      fetchProviderCarousels(watchRegion),
     ]);
   }
 
@@ -96,6 +118,68 @@ class SeerrDashboard extends _$SeerrDashboard {
 
   Future<void> fetchExpectedMovies() async =>
       _safeSet(() => api.discoverExpectedMovies(), (items) => state.copyWith(expectedMovies: items));
+
+  Future<void> fetchProviderCarousels(String watchRegion) async {
+    try {
+      final futures = await Future.wait([
+        api.discoverProviderMedia(watchProviders: '337', watchRegion: watchRegion),
+        api.discoverProviderMedia(watchProviders: '9', watchRegion: watchRegion),
+        api.discoverProviderMedia(watchProviders: '350', watchRegion: watchRegion),
+        api.discoverProviderMedia(watchProviders: '2303', watchRegion: watchRegion),
+        api.discoverProviderMedia(watchProviders: '1899', watchRegion: watchRegion),
+      ]);
+
+      final disneyData = futures[0];
+      final primeData = futures[1];
+      final appleData = futures[2];
+      final paramountData = futures[3];
+      final hboData = futures[4];
+
+      final seenIds = <int>{};
+
+      List<SeerrDashboardPosterModel> mixAndDeduplicate(
+        List<SeerrDashboardPosterModel> movies, 
+        List<SeerrDashboardPosterModel> series
+      ) {
+        final validMovies = movies.where((m) => !seenIds.contains(m.tmdbId)).toList();
+        final validSeries = series.where((s) => !seenIds.contains(s.tmdbId)).toList();
+        
+        final mixed = <SeerrDashboardPosterModel>[];
+        int mIdx = 0;
+        int sIdx = 0;
+        
+        while ((mIdx < validMovies.length || sIdx < validSeries.length) && mixed.length < 40) {
+          if (mIdx < validMovies.length) {
+            final m = validMovies[mIdx++];
+            mixed.add(m);
+            seenIds.add(m.tmdbId);
+          }
+          if (sIdx < validSeries.length && mixed.length < 40) {
+            final s = validSeries[sIdx++];
+            mixed.add(s);
+            seenIds.add(s.tmdbId);
+          }
+        }
+        return mixed;
+      }
+
+      final disneyPlus = mixAndDeduplicate(disneyData.movies, disneyData.series);
+      final primeVideo = mixAndDeduplicate(primeData.movies, primeData.series);
+      final appleTv = mixAndDeduplicate(appleData.movies, appleData.series);
+      final paramount = mixAndDeduplicate(paramountData.movies, paramountData.series);
+      final hboMax = mixAndDeduplicate(hboData.movies, hboData.series);
+
+      state = state.copyWith(
+        disneyPlus: disneyPlus,
+        primeVideo: primeVideo,
+        appleTv: appleTv,
+        paramount: paramount,
+        hboMax: hboMax,
+      );
+    } catch (_) {
+      return;
+    }
+  }
 
   Future<void> fetchExpectedSeries() async =>
       _safeSet(() => api.discoverExpectedSeries(), (items) => state.copyWith(expectedSeries: items));

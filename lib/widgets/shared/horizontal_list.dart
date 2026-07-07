@@ -19,6 +19,7 @@ import 'package:fladder/widgets/shared/focus_row.dart';
 class HorizontalList<T> extends ConsumerStatefulWidget {
   final bool autoFocus;
   final String? label;
+  final Widget? titleLeading;
   final List<Widget> titleActions;
   final VerticalDirection? titleActionsPosition;
   final Function()? onLabelClick;
@@ -43,6 +44,7 @@ class HorizontalList<T> extends ConsumerStatefulWidget {
     this.startIndex,
     this.height,
     this.label,
+    this.titleLeading,
     this.titleActions = const [],
     this.titleActionsPosition = VerticalDirection.up,
     this.onLabelClick,
@@ -218,6 +220,7 @@ class _HorizontalListState extends ConsumerState<HorizontalList> with TickerProv
                     child: ExcludeFocus(
                       child: StickyHeaderText(
                         label: widget.label ?? "",
+                        leading: widget.titleLeading,
                         onClick: AdaptiveLayout.inputDeviceOf(context) == InputDevice.dPad ? null : widget.onLabelClick,
                       ),
                     ),

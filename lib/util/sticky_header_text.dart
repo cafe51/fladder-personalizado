@@ -8,8 +8,9 @@ import 'package:fladder/screens/shared/flat_button.dart';
 class StickyHeaderText extends ConsumerStatefulWidget {
   final String label;
   final Function()? onClick;
+  final Widget? leading;
 
-  const StickyHeaderText({required this.label, this.onClick, super.key});
+  const StickyHeaderText({required this.label, this.onClick, this.leading, super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => StickyHeaderTextState();
@@ -29,6 +30,10 @@ class StickyHeaderTextState extends ConsumerState<StickyHeaderText> {
           crossAxisAlignment: CrossAxisAlignment.end,
           spacing: 6,
           children: [
+            if (widget.leading != null) ...[
+              widget.leading!,
+              const SizedBox(width: 4),
+            ],
             Flexible(
               child: Text(
                 widget.label,
