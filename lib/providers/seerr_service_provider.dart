@@ -664,6 +664,8 @@ class SeerrService {
     required String watchProviders,
     required String watchRegion,
     String? language,
+    String? movieGenre,
+    String? tvGenre,
   }) async {
     final movieFutures = <Future<Response<SeerrDiscoverResponse>>>[];
     final tvFutures = <Future<Response<SeerrDiscoverResponse>>>[];
@@ -678,6 +680,7 @@ class SeerrService {
         watchProviders: watchProviders,
         watchRegion: watchRegion,
         primaryReleaseDateGte: dateString,
+        genre: movieGenre,
         sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverMovies),
       ));
       
@@ -687,6 +690,7 @@ class SeerrService {
         watchProviders: watchProviders,
         watchRegion: watchRegion,
         firstAirDateGte: dateString,
+        genre: tvGenre,
         sortBy: SeerrSortBy.popularityDesc.valueForMode(SeerrSearchMode.discoverTv),
       ));
     }

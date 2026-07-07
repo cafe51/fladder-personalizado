@@ -121,12 +121,16 @@ class SeerrDashboard extends _$SeerrDashboard {
 
   Future<void> fetchProviderCarousels(String watchRegion) async {
     try {
+      final isKidsMode = ref.read(userProvider)?.seerrCredentials?.enableKidsMode == true;
+      final movieGenre = isKidsMode ? '16,10751' : null;
+      final tvGenre = isKidsMode ? '16,10751,10762' : null;
+
       final futures = await Future.wait([
-        api.discoverProviderMedia(watchProviders: '337', watchRegion: watchRegion),
-        api.discoverProviderMedia(watchProviders: '9', watchRegion: watchRegion),
-        api.discoverProviderMedia(watchProviders: '350', watchRegion: watchRegion),
-        api.discoverProviderMedia(watchProviders: '2303', watchRegion: watchRegion),
-        api.discoverProviderMedia(watchProviders: '1899', watchRegion: watchRegion),
+        api.discoverProviderMedia(watchProviders: '337', watchRegion: watchRegion, movieGenre: movieGenre, tvGenre: tvGenre),
+        api.discoverProviderMedia(watchProviders: '9', watchRegion: watchRegion, movieGenre: movieGenre, tvGenre: tvGenre),
+        api.discoverProviderMedia(watchProviders: '350', watchRegion: watchRegion, movieGenre: movieGenre, tvGenre: tvGenre),
+        api.discoverProviderMedia(watchProviders: '2303', watchRegion: watchRegion, movieGenre: movieGenre, tvGenre: tvGenre),
+        api.discoverProviderMedia(watchProviders: '1899', watchRegion: watchRegion, movieGenre: movieGenre, tvGenre: tvGenre),
       ]);
 
       final disneyData = futures[0];
